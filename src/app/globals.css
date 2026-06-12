@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500&family=Quicksand:wght@400;500;600&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Design tokens from approved contract */
+  --color-primary: #f0997b;
+  --color-secondary: #5dcaa5;
+  --color-accent: #fdf6f0;
+  --color-text-primary: #3d3530;
+  --color-text-secondary: #8a796e;
+  --color-text-muted: #e6d2c4;
+  --color-border: #f5c4b3;
+  --color-states-success: #5dcaa5;
+  --color-states-warning: #e6b875;
+  --color-states-error: #f0997b;
+
+  /* Category colors */
+  --color-feeding: #f0997b;
+  --color-diaper: #5dcaa5;
+  --color-sleep: #f0997b;
+  --color-pumping: #e6b875;
+  --color-other: #8a796e;
+
+  /* Typography */
+  --font-heading: "Fredoka", system-ui, -apple-system, sans-serif;
+  --font-body: "Quicksand", system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-body);
+
+  /* Layout */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Legacy shadcn compatibility */
+  --color-background: var(--color-accent);
+  --color-foreground: var(--color-text-primary);
+  --color-muted: var(--color-text-muted);
+  --color-muted-foreground: var(--color-text-secondary);
+  --color-popover: var(--color-accent);
+  --color-popover-foreground: var(--color-text-primary);
+  --color-card: var(--color-accent);
+  --color-card-foreground: var(--color-text-primary);
+  --color-input: var(--color-border);
+  --color-ring: var(--color-primary);
+  --color-destructive: var(--color-states-error);
+  --color-destructive-foreground: #ffffff;
+}
+
+/* CSS custom properties for runtime access */
+:root {
+  --color-primary: #f0997b;
+  --color-secondary: #5dcaa5;
+  --color-accent: #fdf6f0;
+  --color-text-primary: #3d3530;
+  --color-text-secondary: #8a796e;
+  --color-text-muted: #e6d2c4;
+  --color-border: #f5c4b3;
+  --color-feeding: #f0997b;
+  --color-diaper: #5dcaa5;
+  --color-sleep: #f0997b;
+  --color-pumping: #e6b875;
+  --color-other: #8a796e;
+}
+
+@layer base {
+  * {
+    @apply border-[var(--color-border)] outline-[var(--color-primary)];
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    @apply font-body antialiased;
+    touch-action: manipulation;
+  }
+
+  body {
+    @apply bg-[var(--color-accent)] text-[var(--color-text-primary)] min-h-svh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+
+  button,
+  a {
+    touch-action: manipulation;
+  }
+}
+
+@layer utilities {
+  .text-heading {
+    font-family: var(--font-heading);
+  }
+  .text-body {
+    font-family: var(--font-body);
+  }
+}
