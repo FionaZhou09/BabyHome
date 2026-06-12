@@ -71,8 +71,42 @@ function formatTime(iso: string) {
   });
 }
 
-function inferBabyAgeMonths(activities: DemoActivity[]) {
-  return activities[0]?.babyAgeMonths ?? 4;
+const CHINESE_MONTH_NUMBERS: Record<string, number> = {
+  一: 1,
+  二: 2,
+  两: 2,
+  三: 3,
+  四: 4,
+  五: 5,
+  六: 6,
+  七: 7,
+  八: 8,
+  九: 9,
+  十: 10,
+  十一: 11,
+  十二: 12,
+};
+
+function inferTextAgeMonths(message: string) {
+  const digitMatch = message.match(/(\d{1,2})\s*(?:个)?月/);
+  if (digitMatch) {
+    return Math.min(24, Math.max(0, Number(digitMatch[1])));
+  }
+
+  const chineseMatch = message.match(/(十二|十一|十|九|八|七|六|五|四|三|两|二|一)\s*(?:个)?月/);
+  if (chineseMatch) {
+    return CHINESE_MONTH_NUMBERS[chineseMatch[1]];
+  }
+
+  if (/新生儿|刚出生|newborn/i.test(message)) {
+    return 0;
+  }
+
+  return null;
+}
+
+function inferBabyAgeMonths(message: string, activities: DemoActivity[]) {
+  return inferTextAgeMonths(message) ?? activities[0]?.babyAgeMonths ?? 4;
 }
 
 function activityContextLine(activities: DemoActivity[], language: "zh" | "en") {
@@ -368,7 +402,7 @@ export function generateParentSupportReply({
 
   const [knowledgeCard] = retrieveKnowledgeCards(
     cleanMessage,
-    inferBabyAgeMonths(activities)
+    inferBabyAgeMonths(cleanMessage, activities)
   );
   if (knowledgeCard) return answerFromKnowledgeCard(knowledgeCard, activities, language);
 

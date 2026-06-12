@@ -13,6 +13,7 @@ const TOPIC_HINTS: Record<KnowledgeTopic, RegExp[]> = {
   feeding: [/feed|milk|formula|breast|nursing|bottle|hungry|奶|母乳|配方|奶粉|水奶|瓶喂|饿|喂/i],
   sleep: [/sleep|nap|wake|night|bedtime|睡|觉|醒|晚上|夜里|半夜|夜醒|小睡|哄睡/i],
   diaper: [/diaper|poop|stool|bowel|pee|urine|wet|尿布|大便|便便|拉|粑粑|尿|小便/i],
+  development: [/milestone|development|roll|sit|crawl|stand|walk|tummy|里程碑|发育|翻身|坐|爬|站|走|趴/i],
   crying: [/cry|fussy|colic|soothe|calm|哭|哭闹|安抚|肠绞痛/i],
   "parent-support": [/overwhelmed|anxious|exhausted|stress|崩溃|焦虑|撑不住|压力|累/i],
   safety: [/fever|breath|emergency|911|988|发烧|呼吸|急诊|危险|伤害/i],
@@ -43,6 +44,9 @@ function keywordScore(card: BabyCareKnowledgeCard, question: string) {
   return card.keywords.reduce((score, keyword) => {
     const normalizedKeyword = normalize(keyword);
     if (normalizedKeyword && normalizedQuestion.includes(normalizedKeyword)) {
+      if (/^(\d+|[一二三四五六七八九十]+)个月$/.test(normalizedKeyword)) {
+        return score + 1;
+      }
       return score + Math.min(8, Math.max(2, normalizedKeyword.length));
     }
     return score;

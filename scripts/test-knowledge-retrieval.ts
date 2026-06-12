@@ -1,4 +1,5 @@
 import { strict as assert } from "node:assert";
+import { generateParentSupportReply } from "../src/lib/agent/parent-support-agent";
 import { retrieveKnowledgeCards } from "../src/lib/knowledge/retrieve-knowledge-cards";
 
 function assertTopCard(question: string, babyAgeMonths: number, expectedId: string) {
@@ -15,5 +16,55 @@ assertTopCard("新生儿一天拉多少次？", 0, "diaper-newborn-poop-frequenc
 assertTopCard("母乳 2-3 个小时会饿吗？", 1, "feeding-breastfed-newborn-frequency");
 assertTopCard("瓶喂母乳多久喂一次？", 1, "feeding-expressed-milk-bottle-frequency");
 assertTopCard("奶粉水奶可以4-6个小时吗？", 2, "feeding-formula-frequency");
+assertTopCard("新生儿黄疸什么时候要找医生？", 0, "safety-newborn-jaundice-fever");
+assertTopCard("新生儿睡觉怎么才安全？", 0, "sleep-newborn-safe-sleep");
+assertTopCard("2个月宝宝吐奶和胀气怎么办？", 2, "feeding-one-to-three-spit-up-gas");
+assertTopCard("2个月宝宝 wake window 多久？", 2, "sleep-one-to-three-wake-window");
+assertTopCard("5个月宝宝翻身睡觉安全吗？", 5, "safety-three-to-six-rolling-sleep");
+assertTopCard("5个月可以开始辅食了吗？", 5, "feeding-three-to-six-solids-readiness");
+assertTopCard("7个月过敏食物怎么引入？", 7, "feeding-six-to-nine-allergen-introduction");
+assertTopCard("8个月宝宝分离焦虑怎么办？", 8, "crying-six-to-nine-separation-anxiety");
+assertTopCard("10个月奶量下降正常吗？", 10, "feeding-nine-to-twelve-milk-and-meals");
+assertTopCard("11个月宝宝 nap 要怎么转？", 11, "sleep-nine-to-twelve-nap-transition");
+assertTopCard("10个月宝宝站起来家里怎么安全？", 10, "safety-nine-to-twelve-standing-home");
+assertTopCard("带娃好累，感觉自己撑不住", 6, "parent-support-overwhelmed");
+
+const replyWithTextAge = generateParentSupportReply({
+  message: "10个月奶量下降正常吗？",
+  activities: [
+    {
+      id: 1,
+      userId: "demo",
+      category: "feeding",
+      babyAgeMonths: 4,
+      timestamp: new Date().toISOString(),
+    },
+  ],
+});
+
+assert.match(
+  replyWithTextAge,
+  /9-12 个月|三餐节奏|奶量可能慢慢下降/,
+  "Expected text age to override activity age in agent reply"
+);
+
+const napReplyWithTextAge = generateParentSupportReply({
+  message: "11个月宝宝 nap 要怎么转？",
+  activities: [
+    {
+      id: 1,
+      userId: "demo",
+      category: "sleep",
+      babyAgeMonths: 4,
+      timestamp: new Date().toISOString(),
+    },
+  ],
+});
+
+assert.match(
+  napReplyWithTextAge,
+  /9-12 个月|2 个 nap|15-30 分钟/,
+  "Expected text age to guide sleep retrieval when logs have a different age"
+);
 
 console.log("knowledge retrieval tests passed");
