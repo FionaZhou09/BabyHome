@@ -27,7 +27,7 @@ const INTENT_PATTERNS: Record<Intent, RegExp[]> = {
     /累|崩溃|焦虑|压力|害怕|内疚|撑不住|哭|情绪/i,
   ],
   feeding: [/feed|feeding|milk|nursing|formula|bottle|hungry|奶|喂|母乳|配方|瓶喂|饿/i],
-  sleep: [/sleep|nap|wake|night|bedtime|睡|觉|夜醒|小睡|哄睡/i],
+  sleep: [/sleep|nap|wake|waking|night|bedtime|睡|觉|醒|晚上|夜里|半夜|夜醒|小睡|哄睡/i],
   diaper: [/diaper|pee|poop|wet|dirty|尿布|尿|便便|大便|拉/i],
   crying: [/cry|fussy|colic|soothe|calm|哭闹|安抚|哄|肠绞痛/i],
   pattern: [/normal|pattern|summary|today|log|track|正常|规律|总结|今天|记录/i],
@@ -88,14 +88,16 @@ function parentCrisisReply(language: "zh" | "en") {
   if (language === "zh") {
     return [
       "你现在不需要一个人扛着。请先把宝宝放在安全的地方，比如婴儿床里，然后立刻联系一个真人来陪你。",
-      "如果你有伤害自己、伤害宝宝、或控制不住冲动的想法，请马上拨打当地紧急电话；在美国也可以拨打或短信 988。产后心理支持热线 1-833-TLC-MAMA 也可以 24/7 提供帮助。",
+      "如果你在美国或加拿大，并且你或宝宝可能有立即危险，请拨打 911；如果是心理危机，也可以拨打或短信 988。",
+      "美国的孕产/产后心理支持热线是 1-833-TLC-MAMA；加拿大用户可以联系当地省/地区 health line、家庭医生或产后支持资源。",
       "你不是坏父母，这是需要支持的紧急时刻。先让另一个成年人接手宝宝，下一分钟只做求助这一件事。",
     ].join(" ");
   }
 
   return [
     "You do not have to hold this alone. First, place the baby somewhere safe, like their crib, then contact a real person immediately.",
-    "If you might hurt yourself, your baby, or feel unable to control an impulse, call emergency services now. In the U.S., call or text 988. The National Maternal Mental Health Hotline is also available 24/7 at 1-833-TLC-MAMA.",
+    "If you are in the U.S. or Canada and you or the baby may be in immediate danger, call 911. For mental health crisis support, call or text 988.",
+    "In the U.S., the National Maternal Mental Health Hotline is 1-833-TLC-MAMA. In Canada, contact your provincial or territorial health line, family doctor, or local postpartum support service.",
     "This does not make you a bad parent. It means this is a support-now moment. Let another adult take over the baby if possible, and make getting help the only next step.",
   ].join(" ");
 }
@@ -140,9 +142,21 @@ function feedingReply(activities: DemoActivity[], language: "zh" | "en") {
   ].join(" ");
 }
 
-function sleepReply(activities: DemoActivity[], language: "zh" | "en") {
+function sleepReply(message: string, activities: DemoActivity[], language: "zh" | "en") {
   const sleepCount = activities.filter((activity) => activity.category === "sleep").length;
+  const asksAboutWaking = /wake|waking|night|醒|晚上|夜里|半夜|夜醒/i.test(message);
+
   if (language === "zh") {
+    if (asksAboutWaking) {
+      return [
+        "正常，4 个月宝宝晚上反复醒很常见，尤其是睡眠周期变成熟、白天刺激多、猛长期、出牙前后，或需要重新练习自己接觉的时候。",
+        "你可以先不用急着追求“一觉到天亮”。更实际的是看三个信号：宝宝白天精神还可以、吃奶和尿布没有明显下降、醒来后能被安抚回去。",
+        "今晚可以试一个很小的策略：睡前流程固定 10-15 分钟，夜里先等 30-60 秒观察，再用低光、低声音、轻拍或抱起放下安抚。",
+        `我也会参考你的记录；目前最近 7 天里看到 ${sleepCount} 条睡眠记录。记录不用完美，只要能帮你少靠记忆硬撑就够了。`,
+        "如果夜醒伴随发烧、呼吸异常、明显吃奶变差、尿布变少或精神很差，那就建议联系儿科医生。",
+      ].join(" ");
+    }
+
     return [
       `最近记录里有 ${sleepCount} 次睡眠。宝宝睡眠不稳定很常见，尤其在猛长期、出牙、白天刺激多的时候。`,
       "你可以先追求“安全 + 可重复”，而不是完美作息：固定一个睡前小流程，灯光变暗，声音变低，醒来后先观察再介入。",
@@ -150,8 +164,18 @@ function sleepReply(activities: DemoActivity[], language: "zh" | "en") {
     ].join(" ");
   }
 
+  if (asksAboutWaking) {
+    return [
+      "Yes, frequent night waking can be very normal around 4 months. Sleep cycles are maturing, and babies may need help connecting sleep cycles again.",
+      "Before aiming for sleeping through the night, check the calmer signals: baby is alert enough during the day, feeding and wet diapers have not dropped, and baby can usually be soothed back down.",
+      "For tonight, try one small plan: a consistent 10-15 minute bedtime routine, pause 30-60 seconds before intervening, then use low light, a quiet voice, gentle patting, or pick-up-put-down soothing.",
+      `I can also use your logs as context; I see ${sleepCount} recent sleep ${sleepCount === 1 ? "log" : "logs"} in the last 7 days.`,
+      "If night waking comes with fever, breathing changes, poor feeding, fewer wet diapers, or unusual low energy, contact your pediatrician.",
+    ].join(" ");
+  }
+
   return [
-    `I see ${sleepCount} sleep logs recently. Uneven sleep is common, especially during growth shifts, teething, or busy days.`,
+    `I see ${sleepCount} recent sleep ${sleepCount === 1 ? "log" : "logs"}. Uneven sleep is common, especially during growth shifts, teething, or busy days.`,
     "Aim for safe and repeatable before perfect: a small bedtime sequence, dimmer light, quieter voice, and a short pause before intervening when baby stirs.",
     "Safe sleep basics matter most: back to sleep, a firm flat surface, and no soft loose items in the sleep space.",
   ].join(" ");
@@ -243,7 +267,7 @@ export function generateParentSupportReply({
   const intent = detectIntent(cleanMessage);
   if (intent === "emotional") return emotionalReply(cleanMessage, activities, language);
   if (intent === "feeding") return feedingReply(activities, language);
-  if (intent === "sleep") return sleepReply(activities, language);
+  if (intent === "sleep") return sleepReply(cleanMessage, activities, language);
   if (intent === "diaper") return diaperReply(activities, language);
   if (intent === "crying") return cryingReply(language);
   if (intent === "pattern") return patternReply(activities, language);
