@@ -1,6 +1,7 @@
 import type { DemoActivity, DemoChatMessage } from "@/lib/demo/types";
 
 type Intent = "emotional" | "feeding" | "sleep" | "diaper" | "crying" | "pattern" | "general";
+type DiaperTopic = "poop" | "pee" | "general";
 
 interface ParentSupportInput {
   message: string;
@@ -198,6 +199,66 @@ function diaperReply(activities: DemoActivity[], language: "zh" | "en") {
   ].join(" ");
 }
 
+function detectDiaperTopic(message: string): DiaperTopic {
+  if (/poop|stool|bowel|大便|便便|拉|粑粑|屎/i.test(message)) return "poop";
+  if (/pee|urine|wet diaper|尿|湿尿布|小便/i.test(message)) return "pee";
+  return "general";
+}
+
+function poopReply(message: string, language: "zh" | "en") {
+  const isNewborn = /newborn|新生儿|刚出生|出生|first week|第一周/i.test(message);
+
+  if (language === "zh") {
+    if (isNewborn) {
+      return [
+        "新生儿一天拉几次差异很大，但可以这样粗略看：出生后前 1-2 天通常会排黑绿色、黏黏的胎便；到第一周末，很多宝宝一天可以有 5-10 次大便，也可能吃奶后就拉。",
+        "之后随着宝宝长大，次数可能会下降。母乳宝宝有时一天多次，也有些几天一次；配方奶宝宝常见是一天 1 次左右，但也会有个人差异。",
+        "比次数更重要的是：大便是不是柔软、宝宝吃奶和尿布是否正常、精神状态是否还可以。",
+        "如果大便是白色/灰白色、明显带血、黑便不是出生最初几天的胎便、宝宝肚子很胀很痛、持续呕吐、吃奶差或精神很差，建议联系儿科医生。",
+      ].join(" ");
+    }
+
+    return [
+      "宝宝大便次数本来范围就很宽：有的宝宝一天几次，有的几天一次。只要大便是软的、宝宝吃奶和长势正常、精神状态不错，单看次数通常不用太紧张。",
+      "母乳宝宝可能更频繁，也可能过了几周后变少；配方奶宝宝通常大便更成形、频率也可能更少。",
+      "需要留意的是颜色和状态：白色/灰白、红色血便、异常黑便、硬球状便、明显腹胀疼痛、持续呕吐或精神差，都建议问儿科医生。",
+    ].join(" ");
+  }
+
+  if (isNewborn) {
+    return [
+      "Newborn poop frequency varies a lot. In the first 1-2 days, babies usually pass dark, sticky meconium. By the end of the first week, many newborns may poop 5-10 times a day, sometimes after feeds.",
+      "After that, frequency often changes. Breastfed babies may poop several times a day or sometimes go days between stools; formula-fed babies often poop about once a day, but there is variation.",
+      "The calmer checks are: stool is soft, feeding and wet diapers are okay, baby is gaining as expected, and baby seems reasonably alert.",
+      "Call your pediatrician for white or gray stool, blood, black stool beyond the early meconium days, a swollen painful belly, repeated vomiting, poor feeding, or unusual low energy.",
+    ].join(" ");
+  }
+
+  return [
+    "Baby poop frequency has a wide normal range: some babies poop several times a day, while others go a few days between stools.",
+    "Soft stool, normal feeding, steady wet diapers, growth, and alertness matter more than the exact number.",
+    "Ask your pediatrician about white or gray stool, blood, black stool outside the newborn meconium period, hard pellet-like stool, a swollen painful belly, repeated vomiting, poor feeding, or unusual low energy.",
+  ].join(" ");
+}
+
+function wetDiaperReply(activities: DemoActivity[], language: "zh" | "en") {
+  const diaperCount = activities.filter((activity) => activity.category === "diaper").length;
+
+  if (language === "zh") {
+    return [
+      `最近记录里有 ${diaperCount} 次尿布。湿尿布主要用来帮助判断宝宝摄入和补水情况。`,
+      "如果湿尿布突然明显变少、嘴唇很干、哭没有眼泪、囟门凹陷、精神变差，建议尽快联系儿科医生。",
+      "如果只是一天内小波动，可以继续记录，并结合吃奶、精神状态和体重增长一起看。",
+    ].join(" ");
+  }
+
+  return [
+    `I see ${diaperCount} diaper logs recently. Wet diapers are mainly useful for tracking intake and hydration.`,
+    "If wet diapers suddenly drop, lips are very dry, there are no tears when crying, the soft spot looks sunken, or baby seems unusually low-energy, contact your pediatrician promptly.",
+    "If it is just a small day-to-day change, keep tracking and look at feeding, alertness, and growth together.",
+  ].join(" ");
+}
+
 function cryingReply(language: "zh" | "en") {
   if (language === "zh") {
     return [
@@ -268,7 +329,12 @@ export function generateParentSupportReply({
   if (intent === "emotional") return emotionalReply(cleanMessage, activities, language);
   if (intent === "feeding") return feedingReply(activities, language);
   if (intent === "sleep") return sleepReply(cleanMessage, activities, language);
-  if (intent === "diaper") return diaperReply(activities, language);
+  if (intent === "diaper") {
+    const diaperTopic = detectDiaperTopic(cleanMessage);
+    if (diaperTopic === "poop") return poopReply(cleanMessage, language);
+    if (diaperTopic === "pee") return wetDiaperReply(activities, language);
+    return diaperReply(activities, language);
+  }
   if (intent === "crying") return cryingReply(language);
   if (intent === "pattern") return patternReply(activities, language);
   return generalReply(cleanMessage, activities, language);
