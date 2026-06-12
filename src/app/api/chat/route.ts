@@ -9,6 +9,15 @@ import {
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+function streamTextChunks(text: string, size = 36) {
+  const chars = Array.from(text);
+  const chunks: string[] = [];
+  for (let index = 0; index < chars.length; index += size) {
+    chunks.push(chars.slice(index, index + size).join(""));
+  }
+  return chunks;
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const message = typeof body.message === "string" ? body.message : "";
@@ -20,7 +29,7 @@ export async function POST(request: NextRequest) {
   const readable = new ReadableStream({
     async start(controller) {
       try {
-        for (const text of reply.match(/.{1,42}(\s|$)/g) ?? [reply]) {
+        for (const text of streamTextChunks(reply)) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
           await new Promise((resolve) => setTimeout(resolve, 20));
         }
