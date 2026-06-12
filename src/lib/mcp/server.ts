@@ -1,13 +1,13 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import {
-  createActivity,
-  getActivitiesToday,
-  getActivitiesLast7Days,
-} from "@/lib/db/queries/activities";
-import { getLatestInsight } from "@/lib/db/queries/ai";
+  createDemoActivity,
+  getDemoActivities,
+  getDemoInsight,
+} from "@/lib/demo/store";
 
-export function buildMcpServer(userId: string): McpServer {
+export function buildMcpServer(_userId: string): McpServer {
+  void _userId;
   const server = new McpServer({
     name: "babyhome-mcp",
     version: "1.0.0",
@@ -30,19 +30,18 @@ export function buildMcpServer(userId: string): McpServer {
       otherNote: z.string().optional().describe("Note for other activities"),
     },
     async ({ category, babyAgeMonths, feedingSide, feedingDuration, diaperType, sleepLocation, sleepDuration, pumpingLeftAmount, pumpingRightAmount, otherNote }) => {
-      const activity = await createActivity({
-        userId,
+      const activity = createDemoActivity({
         category,
         babyAgeMonths,
-        timestamp: new Date(),
-        feedingType: category === "feeding" ? "breast" : undefined,
+        timestamp: new Date().toISOString(),
+        feedingType: category === "feeding" ? "nursing" : undefined,
         feedingSide,
         feedingDuration,
         diaperType,
         sleepLocation,
-        sleepStart: category === "sleep" ? new Date() : undefined,
+        sleepStart: category === "sleep" ? new Date().toISOString() : undefined,
         sleepEnd: category === "sleep" && sleepDuration
-          ? new Date(Date.now() + sleepDuration * 3600000)
+          ? new Date(Date.now() + sleepDuration * 3600000).toISOString()
           : undefined,
         pumpingLeftAmount,
         pumpingRightAmount,
@@ -60,7 +59,7 @@ export function buildMcpServer(userId: string): McpServer {
     "Get all baby activities logged today for the current user.",
     {},
     async () => {
-      const activities = await getActivitiesToday(userId);
+      const activities = getDemoActivities();
       return {
         content: [{ type: "text", text: JSON.stringify({ activities, count: activities.length }) }],
       };
@@ -73,7 +72,7 @@ export function buildMcpServer(userId: string): McpServer {
     "Get a summary of all baby activities from the last 7 days, grouped by category.",
     {},
     async () => {
-      const activities = await getActivitiesLast7Days(userId);
+      const activities = getDemoActivities("7days");
       const counts: Record<string, number> = {};
       activities.forEach((a) => {
         counts[a.category] = (counts[a.category] || 0) + 1;
@@ -97,7 +96,7 @@ export function buildMcpServer(userId: string): McpServer {
     "Get the most recent AI-generated insight about the baby's patterns.",
     {},
     async () => {
-      const insight = await getLatestInsight(userId);
+      const insight = getDemoInsight();
       return {
         content: [{
           type: "text",
@@ -117,7 +116,7 @@ export function buildMcpServer(userId: string): McpServer {
       babyAgeMonths: z.number().min(0).max(12).describe("Baby's age in months"),
     },
     async ({ babyAgeMonths }) => {
-      const activities = await getActivitiesToday(userId);
+      const activities = getDemoActivities();
       const feedCount = activities.filter((a) => a.category === "feeding").length;
       const diaperCount = activities.filter((a) => a.category === "diaper").length;
       const sleepCount = activities.filter((a) => a.category === "sleep").length;

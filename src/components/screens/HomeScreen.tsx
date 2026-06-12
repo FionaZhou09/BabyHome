@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Plus, Shield, Star, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { request } from "@/lib/api/request";
-import { useEazo } from "@eazo/sdk/react";
 import { DailyReportCard } from "./DailyReportCard";
 import { WeeklyInsightsChart } from "./WeeklyInsightsChart";
 import { MoodCheckin } from "./MoodCheckin";
@@ -65,7 +64,6 @@ function getStoredBabyProfile() {
 
 export function HomeScreen() {
   const router = useRouter();
-  const user = useEazo((s) => s.auth.user);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [insight, setInsight] = useState<Insight | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,7 +79,6 @@ export function HomeScreen() {
   }, [profile.hasProfile, router]);
 
   useEffect(() => {
-    if (!user) return;
     async function load() {
       try {
         const [actRes, insightRes] = await Promise.all([
@@ -99,7 +96,7 @@ export function HomeScreen() {
       }
     }
     load();
-  }, [user]);
+  }, []);
 
   function formatActivityLabel(a: Activity): string {
     if (a.category === "feeding") {
@@ -165,7 +162,7 @@ export function HomeScreen() {
                   {babyName}
                 </h2>
                 <p className="text-sm text-[var(--color-text-secondary)] font-medium mt-0.5">
-                  {babyAge} months old · {user?.name || ""}
+                  {babyAge} months old
                 </p>
               </div>
             </div>

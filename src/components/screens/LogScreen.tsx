@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Shield, Star, Clock as ClockIcon, Minus } from "lucide-react";
 import { request } from "@/lib/api/request";
 import { toast } from "sonner";
-import { memory } from "@eazo/sdk";
 
 const categories = [
   { key: "feeding", label: "Feed", icon: Plus, bg: "#fff8f5", color: "#f0997b" },
@@ -106,15 +105,6 @@ export function LogScreen() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      memory
-        .reportAction({
-          content: `User logged ${activeCategory} activity at ${new Date().toLocaleTimeString("en-US")}`,
-          event_type: "create",
-          page: "logs",
-          metadata: { type: "log_activity", category: activeCategory },
-        })
-        .catch(() => {});
 
       toast.success("Activity logged!");
       router.push("/");

@@ -8,7 +8,6 @@ async function handleMcpRequest(request: NextRequest): Promise<Response> {
   if (!auth.ok) return auth.response;
 
   const transport = new WebStandardStreamableHTTPServerTransport({
-    // Stateless mode: each serverless invocation is independent
     sessionIdGenerator: undefined,
   });
 

@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { EazoProvider } from "@eazo/sdk/react";
 import { cn } from "@/utils/utils";
 import { Toaster } from "@/components/ui/sonner";
-import { UserSyncEffect } from "@/components/user-profile/user-sync-effect";
 import { AppShell } from "@/components/layout/app-shell";
 
 const publicOrigin =
@@ -45,11 +43,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={cn("min-h-svh flex flex-col font-body antialiased")}>
-        <EazoProvider>
-          <UserSyncEffect />
-          <AppShell>{children}</AppShell>
-          <Toaster />
-        </EazoProvider>
+        <AppShell>{children}</AppShell>
+        <Toaster />
       </body>
     </html>
   );

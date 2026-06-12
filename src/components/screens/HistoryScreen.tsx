@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Calendar } from "lucide-react";
 import { request } from "@/lib/api/request";
-import { useEazo } from "@eazo/sdk/react";
 
 interface Activity {
   id: number;
@@ -40,12 +39,10 @@ const categoryLabels: Record<string, string> = {
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export function HistoryScreen() {
-  const user = useEazo((s) => s.auth.user);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
     async function load() {
       try {
         const res = await request("/api/activities?range=7days");
@@ -57,7 +54,7 @@ export function HistoryScreen() {
       }
     }
     load();
-  }, [user]);
+  }, []);
 
   function formatTitle(a: Activity): string {
     if (a.category === "feeding") {

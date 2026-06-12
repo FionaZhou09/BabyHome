@@ -1,48 +1,37 @@
-A minimal Next.js starter for building apps inside the [Eazo](https://eazo.ai) platform. Includes a working example of the Eazo session token flow: the app requests the encrypted user token from the host via `postMessage`, sends it to a Next.js API route, decrypts it server-side with `@eazo/node-sdk`, and returns the user profile.
+# BabyHome
 
-## Getting Started
+A local-first baby tracking app built with Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, lucide-react, and framer-motion.
 
-Install dependencies with Bun:
+## Run Locally
 
 ```bash
 bun install
-```
-
-If dependency installation stalls on this machine during `sharp` setup, use:
-
-```bash
-SHARP_IGNORE_GLOBAL_LIBVIPS=1 bun install
-```
-
-Then start the development server:
-
-```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open the local URL printed by Next.js, usually:
 
-## Environment Variables
-
-Copy `.env.example` to `.env` and fill in your private key:
-
-```bash
-cp .env.example .env
+```text
+http://localhost:3000
 ```
 
-| Variable | Description |
-|---|---|
-| `EAZO_PRIVATE_KEY` | Your Eazo developer private key (hex, 64 chars). Used server-side to decrypt the user session token. |
+Next.js 16 requires Node.js 20.9 or newer.
 
-You can generate a keypair in the Eazo developer settings. Never expose the private key to the browser.
+## What Works Now
 
-## Learn More
+- Onboarding stores the baby profile in `localStorage`
+- Home dashboard keeps the existing BabyHome design
+- Activity logging works against a local in-memory demo store
+- History and detail screens read from the local demo API
+- Chat streams placeholder agent output
+- Insights return placeholder local content
 
-- [Eazo Documentation](https://docs.eazo.ai)
-- [Next.js Documentation](https://nextjs.org/docs)
+## Future Agent Slot
 
-## Deploy on Vercel
+The placeholder agent lives at:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```text
+src/lib/agent/placeholder.ts
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Replace that module and the API handlers under `src/app/api/chat` and `src/app/api/insights` when you are ready to wire in your own agent.

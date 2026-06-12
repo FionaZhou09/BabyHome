@@ -4,8 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Send, Star } from "lucide-react";
 import { request } from "@/lib/api/request";
-import { useEazo } from "@eazo/sdk/react";
-import { memory } from "@eazo/sdk";
 
 interface Message {
   role: "user" | "assistant";
@@ -20,7 +18,6 @@ interface ChatHistoryMessage {
 }
 
 export function ChatScreen() {
-  const user = useEazo((s) => s.auth.user);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -28,7 +25,6 @@ export function ChatScreen() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!user) return;
     async function loadHistory() {
       try {
         const res = await request("/api/chat");
@@ -48,7 +44,7 @@ export function ChatScreen() {
       }
     }
     loadHistory();
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -107,14 +103,6 @@ export function ChatScreen() {
         }
       }
 
-      memory
-        .reportAction({
-          content: `User asked AI: "${userMsg.slice(0, 60)}"`,
-          event_type: "create",
-          page: "chat",
-          metadata: { type: "ai_chat_message" },
-        })
-        .catch(() => {});
     } catch {
       setIsTyping(false);
       setMessages((prev) => [
