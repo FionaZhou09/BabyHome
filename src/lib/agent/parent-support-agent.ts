@@ -1,4 +1,6 @@
 import type { DemoActivity, DemoChatMessage } from "@/lib/demo/types";
+import type { BabyCareKnowledgeCard } from "@/lib/knowledge/baby-care-cards";
+import { retrieveKnowledgeCards } from "@/lib/knowledge/retrieve-knowledge-cards";
 
 type Intent = "emotional" | "feeding" | "sleep" | "diaper" | "crying" | "pattern" | "general";
 type DiaperTopic = "poop" | "pee" | "general";
@@ -67,6 +69,45 @@ function formatTime(iso: string) {
     minute: "2-digit",
     hour12: true,
   });
+}
+
+function inferBabyAgeMonths(activities: DemoActivity[]) {
+  return activities[0]?.babyAgeMonths ?? 4;
+}
+
+function activityContextLine(activities: DemoActivity[], language: "zh" | "en") {
+  const { counts } = summarizeActivities(activities);
+  if (activities.length === 0) {
+    return language === "zh"
+      ? "我现在还没有看到最近记录，所以先按通用月龄知识回答。"
+      : "I do not see recent logs yet, so I will answer from general age-based guidance.";
+  }
+
+  if (language === "zh") {
+    return `结合最近记录，我看到 ${counts.feeding ?? 0} 次喂养、${counts.diaper ?? 0} 次尿布、${counts.sleep ?? 0} 次睡眠。记录不用完美，它只是帮你少靠记忆硬撑。`;
+  }
+
+  return `From recent logs, I see ${counts.feeding ?? 0} feeding, ${counts.diaper ?? 0} diaper, and ${counts.sleep ?? 0} sleep entries. Logs do not need to be perfect; they are here to lower your mental load.`;
+}
+
+function sourceLine(card: BabyCareKnowledgeCard, language: "zh" | "en") {
+  const labels = card.sources.slice(0, 2).map((source) => source.label).join(", ");
+  return language === "zh" ? `参考方向：${labels}。` : `Reference direction: ${labels}.`;
+}
+
+function answerFromKnowledgeCard(
+  card: BabyCareKnowledgeCard,
+  activities: DemoActivity[],
+  language: "zh" | "en"
+) {
+  const lines = [card.answer[language], activityContextLine(activities, language)];
+
+  if (card.warningSigns) {
+    lines.push(card.warningSigns[language]);
+  }
+
+  lines.push(sourceLine(card, language));
+  return lines.join(" ");
 }
 
 function babyUrgentReply(language: "zh" | "en") {
@@ -324,6 +365,12 @@ export function generateParentSupportReply({
 
   if (hasMatch(cleanMessage, PARENT_CRISIS_PATTERNS)) return parentCrisisReply(language);
   if (hasMatch(cleanMessage, BABY_URGENT_PATTERNS)) return babyUrgentReply(language);
+
+  const [knowledgeCard] = retrieveKnowledgeCards(
+    cleanMessage,
+    inferBabyAgeMonths(activities)
+  );
+  if (knowledgeCard) return answerFromKnowledgeCard(knowledgeCard, activities, language);
 
   const intent = detectIntent(cleanMessage);
   if (intent === "emotional") return emotionalReply(cleanMessage, activities, language);
