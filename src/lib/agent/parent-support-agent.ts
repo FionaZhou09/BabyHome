@@ -2,6 +2,10 @@ import type { DemoActivity, DemoChatMessage } from "@/lib/demo/types";
 import type { BabyCareKnowledgeCard } from "@/lib/knowledge/baby-care-cards";
 import { retrieveKnowledgeCards } from "@/lib/knowledge/retrieve-knowledge-cards";
 import { detectEmotion, type EmotionDetectionResult } from "./emotion-detector";
+import {
+  getPromptTemplateForEmotion,
+  type ParentSupportPromptTemplate,
+} from "./prompt-templates";
 
 type Intent = "emotional" | "feeding" | "sleep" | "diaper" | "crying" | "pattern" | "general";
 type DiaperTopic = "poop" | "pee" | "general";
@@ -27,6 +31,7 @@ export interface ParentSupportContext {
   cleanMessage: string;
   language: "zh" | "en";
   emotion: EmotionDetectionResult;
+  promptTemplate: ParentSupportPromptTemplate;
   babyAgeMonths: number;
   knowledgeCards: BabyCareKnowledgeCard[];
   logContext: ActivityLogContext;
@@ -491,6 +496,7 @@ export function buildParentSupportContext({
   const cleanMessage = message.trim();
   const language = detectLanguage(cleanMessage);
   const emotion = detectEmotion(cleanMessage);
+  const promptTemplate = getPromptTemplateForEmotion(emotion.emotionState);
   const babyAgeMonths = inferBabyAgeMonths(cleanMessage, activities);
   const knowledgeCards = retrieveKnowledgeCards(cleanMessage, babyAgeMonths, 2);
   const logContext = readActivityLogContext(activities);
@@ -501,6 +507,7 @@ export function buildParentSupportContext({
     cleanMessage,
     language,
     emotion,
+    promptTemplate,
     babyAgeMonths,
     knowledgeCards,
     logContext,

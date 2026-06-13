@@ -5,6 +5,7 @@ import {
   buildParentSupportContext,
   generateParentSupportReply,
 } from "../src/lib/agent/parent-support-agent";
+import { getPromptTemplateForEmotion } from "../src/lib/agent/prompt-templates";
 import { retrieveKnowledgeCards } from "../src/lib/knowledge/retrieve-knowledge-cards";
 
 function assertTopCard(question: string, babyAgeMonths: number, expectedId: string) {
@@ -143,6 +144,18 @@ assert.ok(
 );
 assert.equal(urgentPipelineContext.logContext.summary.counts.feeding, 1);
 assert.equal(urgentPipelineContext.safety.status, "parent-crisis");
+
+const collapsingPrompt = getPromptTemplateForEmotion("collapsing");
+assert.match(collapsingPrompt.responseOrder.zh, /共情.*信息|稳定.*信息/);
+assert.match(collapsingPrompt.system.zh, /不要一开始就给大量知识/);
+
+const anxiousPrompt = getPromptTemplateForEmotion("anxious-stable");
+assert.match(anxiousPrompt.responseOrder.zh, /情绪.*信息.*并行/);
+assert.match(anxiousPrompt.system.zh, /不要只安慰/);
+
+const learningPrompt = getPromptTemplateForEmotion("learning");
+assert.match(learningPrompt.responseOrder.zh, /直接.*知识/);
+assert.match(learningPrompt.system.zh, /少情绪铺垫/);
 
 const parentSupportAgentSource = readFileSync(
   new URL("../src/lib/agent/parent-support-agent.ts", import.meta.url),
