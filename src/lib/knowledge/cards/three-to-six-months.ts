@@ -57,6 +57,25 @@ export const threeToSixMonthCards: BabyCareKnowledgeCard[] = [
     ],
   },
   {
+    id: "safety-three-to-six-rolling-home",
+    title: "Rolling baby home safety",
+    ageRangeMonths: { min: 3, max: 6 },
+    topics: ["safety"],
+    keywords: ["翻身", "会翻身", "家里", "居家", "怎么安全", "家里安全", "换尿布台", "沙发", "床上", "摔", "rolling safety", "fall", "changing table"],
+    answer: {
+      zh: "宝宝会翻身后，最大的变化是“不能再假设他会待在原地”。不要把宝宝单独放在床、沙发、换尿布台等高处；需要转身拿东西时，先把宝宝放到地垫、婴儿床或安全围栏里。地面时间也要先清掉小物、电线和容易倒的东西。",
+      en: "Once baby can roll, the biggest safety change is that you cannot assume they will stay put. Do not leave baby alone on a bed, couch, or changing table. If you need to turn away, move baby to the floor, crib, or a safe play area first. Clear small objects, cords, and tip-prone items from floor time.",
+    },
+    warningSigns: {
+      zh: "如果跌落后嗜睡、反复呕吐、抽搐、行为异常、头部明显受伤，或你担心严重受伤，请急诊或拨打 911。",
+      en: "After a fall, seek urgent care or call 911 if baby is very sleepy, vomits repeatedly, has a seizure, acts abnormally, has obvious head injury, or you worry about serious injury.",
+    },
+    sources: [
+      { label: "CDC infant and toddler safety", url: "https://www.cdc.gov/parents/infants/safety.html" },
+      { label: "Mayo Clinic sick baby signs", url: "https://www.mayoclinic.org/healthy-lifestyle/infant-and-toddler-health/in-depth/healthy-baby/art-20047793" },
+    ],
+  },
+  {
     id: "feeding-three-to-six-solids-readiness",
     title: "Signs of readiness for solids",
     ageRangeMonths: { min: 3, max: 6 },
@@ -109,6 +128,24 @@ export const threeToSixMonthCards: BabyCareKnowledgeCard[] = [
     sources: [
       { label: "CDC milestones by 4 months", url: "https://www.cdc.gov/act-early/milestones/4-months.html" },
       { label: "CDC milestones by 6 months", url: "https://www.cdc.gov/act-early/milestones/6-months.html" },
+    ],
+  },
+  {
+    id: "crying-three-to-six-soothing",
+    title: "Crying and soothing at 3-6 months",
+    ageRangeMonths: { min: 3, max: 6 },
+    topics: ["crying"],
+    keywords: ["3个月", "4个月", "5个月", "6个月", "哭闹", "安抚", "哄", "烦躁", "出牙", "fussy", "crying", "soothe", "teething"],
+    answer: {
+      zh: "3-6 个月哭闹可能来自困、过度刺激、想换姿势、练新技能、出牙前后或需要更多互动。可以先降低刺激：灯暗一点、声音小一点、换到安静房间；再试抱起放下、轻拍、出门走一小圈、给安全牙胶。安抚不是把哭声立刻关掉，而是帮宝宝慢慢降下来。",
+      en: "At 3-6 months, fussiness can come from tiredness, overstimulation, wanting a new position, practicing skills, teething, or needing interaction. Lower stimulation first: dim light, quieter voice, calmer room; then try pick-up-put-down, gentle patting, a short walk, or a safe teether.",
+    },
+    warningSigns: {
+      zh: "如果哭闹突然异常、持续无法安抚，并伴随发烧、呼吸异常、呕吐、吃奶差、尿布减少或精神差，请联系儿科医生。",
+      en: "Contact your pediatrician if crying is suddenly unusual, inconsolable, and comes with fever, breathing changes, vomiting, poor feeding, fewer wet diapers, or low energy.",
+    },
+    sources: [
+      { label: "HealthyChildren crying and colic", url: "https://www.healthychildren.org/English/ages-stages/baby/crying-colic/Pages/default.aspx" },
     ],
   },
   {

@@ -18,16 +18,23 @@ assertTopCard("瓶喂母乳多久喂一次？", 1, "feeding-expressed-milk-bottl
 assertTopCard("奶粉水奶可以4-6个小时吗？", 2, "feeding-formula-frequency");
 assertTopCard("新生儿黄疸什么时候要找医生？", 0, "safety-newborn-jaundice-fever");
 assertTopCard("新生儿睡觉怎么才安全？", 0, "sleep-newborn-safe-sleep");
+assertTopCard("新生儿发育怎么陪玩？", 0, "development-newborn-early-interaction");
+assertTopCard("新生儿一直哭怎么安抚？", 0, "crying-newborn-soothing");
 assertTopCard("2个月宝宝吐奶和胀气怎么办？", 2, "feeding-one-to-three-spit-up-gas");
 assertTopCard("2个月宝宝 wake window 多久？", 2, "sleep-one-to-three-wake-window");
+assertTopCard("2个月带娃压力好大怎么办？", 2, "parent-support-one-to-three-rest-and-help");
 assertTopCard("5个月宝宝翻身睡觉安全吗？", 5, "safety-three-to-six-rolling-sleep");
 assertTopCard("5个月可以开始辅食了吗？", 5, "feeding-three-to-six-solids-readiness");
+assertTopCard("4个月哭闹怎么安抚？", 4, "crying-three-to-six-soothing");
+assertTopCard("5个月宝宝会翻身了家里怎么安全？", 5, "safety-three-to-six-rolling-home");
 assertTopCard("7个月过敏食物怎么引入？", 7, "feeding-six-to-nine-allergen-introduction");
 assertTopCard("8个月宝宝分离焦虑怎么办？", 8, "crying-six-to-nine-separation-anxiety");
+assertTopCard("7个月辅食怎么避免噎住？", 7, "safety-six-to-nine-choking-babyproofing");
 assertTopCard("10个月奶量下降正常吗？", 10, "feeding-nine-to-twelve-milk-and-meals");
 assertTopCard("11个月宝宝 nap 要怎么转？", 11, "sleep-nine-to-twelve-nap-transition");
 assertTopCard("10个月宝宝站起来家里怎么安全？", 10, "safety-nine-to-twelve-standing-home");
 assertTopCard("带娃好累，感觉自己撑不住", 6, "parent-support-overwhelmed");
+assertTopCard("宝宝什么时候需要急诊？", 6, "safety-common-urgent-care");
 
 const replyWithTextAge = generateParentSupportReply({
   message: "10个月奶量下降正常吗？",

@@ -127,4 +127,23 @@ export const oneToThreeMonthCards: BabyCareKnowledgeCard[] = [
       { label: "HealthyChildren fever and baby", url: "https://www.healthychildren.org/English/health-issues/conditions/fever/Pages/Fever-and-Your-Baby.aspx" },
     ],
   },
+  {
+    id: "parent-support-one-to-three-rest-and-help",
+    title: "Parent support at 1-3 months",
+    ageRangeMonths: { min: 1, max: 3 },
+    topics: ["parent-support"],
+    keywords: ["1个月", "2个月", "3个月", "带娃压力", "压力好大", "睡不够", "累", "焦虑", "帮忙", "postpartum", "exhausted", "support"],
+    answer: {
+      zh: "1-3 个月常常是父母开始真正累积疲惫的时候：白天要照顾，夜里还被切碎。你可以把支持具体化：让别人负责一顿瓶喂/拍嗝/洗奶瓶/买菜，而不是笼统说“帮一下”。今天只需要安排一个可执行的休息窗口，哪怕 20 分钟。",
+      en: "At 1-3 months, fatigue often starts to accumulate: daytime care plus fragmented nights. Make help concrete: ask someone to handle one bottle, burping, washing bottles, or groceries instead of generally asking for help. Today only needs one realistic rest window, even 20 minutes.",
+    },
+    warningSigns: {
+      zh: "如果你持续几天绝望、吃不下睡不着、无法享受任何事，或担心自己会伤害自己/宝宝，请联系医生、988、产后心理热线或当地紧急服务。",
+      en: "If you feel hopeless for days, cannot eat or sleep, cannot enjoy anything, or might hurt yourself/baby, contact a clinician, 988, a maternal mental health hotline, or local emergency services.",
+    },
+    sources: [
+      { label: "National Maternal Mental Health Hotline", url: "https://mchb.hrsa.gov/programs-impact/national-maternal-mental-health-hotline" },
+      { label: "988 Lifeline", url: "https://988lifeline.org/" },
+    ],
+  },
 ];

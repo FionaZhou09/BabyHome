@@ -39,6 +39,25 @@ export const sixToNineMonthCards: BabyCareKnowledgeCard[] = [
     ],
   },
   {
+    id: "safety-six-to-nine-choking-babyproofing",
+    title: "Choking and babyproofing at 6-9 months",
+    ageRangeMonths: { min: 6, max: 9 },
+    topics: ["safety"],
+    keywords: ["噎住", "呛到", "窒息", "辅食安全", "babyproof", "安全", "choking", "gagging", "small objects", "crawling safety"],
+    answer: {
+      zh: "6-9 个月开始辅食和移动后，安全重点是防噎和防够到危险物。食物要坐着吃、有人看着、切成合适大小，避免整颗葡萄、坚果、爆米花、硬块、厚花生酱团等高风险食物。地面要清小物、硬币、电池、磁铁、电线和清洁用品。",
+      en: "At 6-9 months, solids and movement shift safety toward choking prevention and babyproofing. Feed baby seated and supervised, prepare food in safe sizes, and avoid whole grapes, nuts, popcorn, hard chunks, thick globs of peanut butter, and other high-risk foods. Clear small objects, coins, batteries, magnets, cords, and cleaners from the floor.",
+    },
+    warningSigns: {
+      zh: "如果宝宝无法咳出、不能哭/发声、呼吸困难或发紫，请立即按急救处理并拨打 911。",
+      en: "If baby cannot cough it out, cannot cry/make sounds, has trouble breathing, or turns blue, treat it as an emergency and call 911.",
+    },
+    sources: [
+      { label: "CDC choking hazards", url: "https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/choking-hazards.html" },
+      { label: "HealthyChildren choking prevention", url: "https://www.healthychildren.org/English/health-issues/injuries-emergencies/pages/Choking-Prevention.aspx" },
+    ],
+  },
+  {
     id: "sleep-six-to-nine-night-waking",
     title: "Night waking at 6-9 months",
     ageRangeMonths: { min: 6, max: 9 },

@@ -96,6 +96,42 @@ export const zeroToOneMonthCards: BabyCareKnowledgeCard[] = [
     ],
   },
   {
+    id: "development-newborn-early-interaction",
+    title: "Newborn development and interaction",
+    ageRangeMonths: { min: 0, max: 1 },
+    topics: ["development"],
+    keywords: ["新生儿", "发育", "陪玩", "互动", "看脸", "趴", "tummy time", "development", "interaction", "play"],
+    answer: {
+      zh: "新生儿的“发育练习”很小：看你的脸、听你的声音、被抱着感到安全、短短几分钟清醒时趴在你胸前或安全平面上。你不用准备复杂玩具，面对面说话、唱歌、换尿布时慢慢告诉宝宝你在做什么，就已经是在支持发育。",
+      en: "Newborn development practice is tiny: looking at your face, hearing your voice, feeling safe while held, and brief tummy time on your chest or a safe surface when awake. You do not need complicated toys; face-to-face talking, singing, and narrating diaper changes already support development.",
+    },
+    warningSigns: {
+      zh: "如果宝宝完全不对声音有反应、身体特别软或僵、吃奶和清醒状态让你担心，请联系儿科医生。",
+      en: "If baby does not respond to sound, seems very floppy or stiff, or feeding/alertness worries you, contact your pediatrician.",
+    },
+    sources: [
+      { label: "CDC milestones by 2 months", url: "https://www.cdc.gov/act-early/milestones/2-months.html" },
+    ],
+  },
+  {
+    id: "crying-newborn-soothing",
+    title: "Newborn crying and soothing",
+    ageRangeMonths: { min: 0, max: 1 },
+    topics: ["crying"],
+    keywords: ["新生儿", "一直哭", "哭闹", "安抚", "哄", "抱睡", "witching hour", "crying", "soothe", "fussy"],
+    answer: {
+      zh: "新生儿哭常常是在表达基本需求或过度刺激。先按顺序排查：饿、尿布、困、冷热、胀气、需要抱。都处理过后，可以试低光、包裹感、轻拍、白噪音、抱着慢走。哭声很磨人，如果你快撑不住，先把宝宝放回安全睡眠处，离开几分钟呼吸一下并叫人帮忙。",
+      en: "Newborn crying often means basic needs or overstimulation. Check hunger, diaper, tiredness, temperature, gas, and need for closeness. Then try dim light, a snug feeling, gentle patting, white noise, or slow walking. If you are close to losing it, place baby in a safe sleep space, step away briefly, breathe, and call for help.",
+    },
+    warningSigns: {
+      zh: "如果哭声异常尖锐、持续无法安抚，并伴随发烧、呕吐、呼吸异常、吃奶差、精神差，请联系儿科医生或急诊。",
+      en: "If crying is unusually high-pitched or inconsolable and comes with fever, vomiting, breathing changes, poor feeding, or low energy, contact your pediatrician or urgent care.",
+    },
+    sources: [
+      { label: "HealthyChildren crying and colic", url: "https://www.healthychildren.org/English/ages-stages/baby/crying-colic/Pages/default.aspx" },
+    ],
+  },
+  {
     id: "safety-newborn-jaundice-fever",
     title: "Newborn jaundice and fever reminders",
     ageRangeMonths: { min: 0, max: 1 },
