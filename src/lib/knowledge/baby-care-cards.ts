@@ -1,8 +1,10 @@
 import { commonCareCards } from "./cards/common";
+import { eighteenToTwentyFourMonthCards } from "./cards/eighteen-to-twenty-four-months";
 import { oneToThreeMonthCards } from "./cards/one-to-three-months";
 import { threeToSixMonthCards } from "./cards/three-to-six-months";
 import { sixToNineMonthCards } from "./cards/six-to-nine-months";
 import { nineToTwelveMonthCards } from "./cards/nine-to-twelve-months";
+import { twelveToEighteenMonthCards } from "./cards/twelve-to-eighteen-months";
 import { zeroToOneMonthCards } from "./cards/zero-to-one-month";
 
 export type KnowledgeTopic =
@@ -44,4 +46,6 @@ export const babyCareKnowledgeCards: BabyCareKnowledgeCard[] = [
   ...threeToSixMonthCards,
   ...sixToNineMonthCards,
   ...nineToTwelveMonthCards,
+  ...twelveToEighteenMonthCards,
+  ...eighteenToTwentyFourMonthCards,
 ];

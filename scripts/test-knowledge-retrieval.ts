@@ -44,6 +44,12 @@ assertTopCard("7个月辅食怎么避免噎住？", 7, "safety-six-to-nine-choki
 assertTopCard("10个月奶量下降正常吗？", 10, "feeding-nine-to-twelve-milk-and-meals");
 assertTopCard("11个月宝宝 nap 要怎么转？", 11, "sleep-nine-to-twelve-nap-transition");
 assertTopCard("10个月宝宝站起来家里怎么安全？", 10, "safety-nine-to-twelve-standing-home");
+assertTopCard("13个月辅食挑食怎么办？", 13, "feeding-twelve-to-eighteen-toddler-meals");
+assertTopCard("15个月不怎么说话正常吗？", 15, "development-twelve-to-eighteen-language");
+assertTopCard("16个月可以开始如厕训练吗？", 16, "diaper-twelve-to-eighteen-potty-readiness");
+assertTopCard("20个月 tantrum 怎么办？", 20, "crying-eighteen-to-twenty-four-tantrums");
+assertTopCard("22个月怎么断奶？", 22, "feeding-eighteen-to-twenty-four-weaning");
+assertTopCard("23个月午睡不睡怎么办？", 23, "sleep-eighteen-to-twenty-four-nap-resistance");
 assertTopCard("带娃好累，感觉自己撑不住", 6, "parent-support-overwhelmed");
 assertTopCard("宝宝什么时候需要急诊？", 6, "safety-common-urgent-care");
 
@@ -83,6 +89,25 @@ assert.match(
   napReplyWithTextAge,
   /9-12 个月|2 个 nap|15-30 分钟/,
   "Expected text age to guide sleep retrieval when logs have a different age"
+);
+
+const toddlerWeaningReply = generateParentSupportReply({
+  message: "22个月怎么断奶？",
+  activities: [
+    {
+      id: 1,
+      userId: "demo",
+      category: "feeding",
+      babyAgeMonths: 4,
+      timestamp: new Date().toISOString(),
+    },
+  ],
+});
+
+assert.match(
+  toddlerWeaningReply,
+  /18-24 个月断奶|一次只减少一个奶次|夜奶/,
+  "Expected text age to retrieve toddler weaning guidance"
 );
 
 const combinedKnowledgeReply = generateParentSupportReply({
