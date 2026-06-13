@@ -7,6 +7,7 @@ import {
 } from "../src/lib/agent/parent-support-agent";
 import { getPromptTemplateForEmotion } from "../src/lib/agent/prompt-templates";
 import { analyzeBabyPatterns } from "../src/lib/analytics/baby-pattern-analyzer";
+import { generateWeeklyFeedingInsight } from "../src/lib/insights/weekly-feeding-insight";
 import { retrieveKnowledgeCards } from "../src/lib/knowledge/retrieve-knowledge-cards";
 
 function assertTopCard(question: string, babyAgeMonths: number, expectedId: string) {
@@ -239,6 +240,23 @@ const sparsePatternAnalysis = analyzeBabyPatterns(
 );
 assert.ok(sparsePatternAnalysis.anomalies.some((item) => item.code === "feeding-insufficient-data"));
 assert.ok(sparsePatternAnalysis.anomalies.some((item) => item.code === "sleep-insufficient-data"));
+
+const weeklyInsight = generateWeeklyFeedingInsight(
+  [
+    { id: 1, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(2) },
+    { id: 2, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(5) },
+    { id: 3, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(8) },
+    { id: 4, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(30) },
+    { id: 5, userId: "demo", category: "sleep", babyAgeMonths: 4, timestamp: hoursAgo(7) },
+  ],
+  { now: new Date(baseTime) }
+);
+assert.equal(weeklyInsight.windowDays, 7);
+assert.equal(weeklyInsight.metrics.feedingCount, 4);
+assert.equal(weeklyInsight.metrics.averageFeedingIntervalHours, 9.3);
+assert.match(weeklyInsight.title, /这周宝宝的规律/);
+assert.match(weeklyInsight.summary, /4 次喂养记录/);
+assert.match(weeklyInsight.pushText, /这周宝宝的规律/);
 
 const currentTime = Date.now();
 const relativeHoursAgo = (hours: number) =>

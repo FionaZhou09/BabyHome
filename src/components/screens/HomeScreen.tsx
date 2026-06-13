@@ -6,6 +6,7 @@ import { Plus, Shield, Star, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { request } from "@/lib/api/request";
 import { DailyReportCard } from "./DailyReportCard";
+import { WeeklyFeedingInsightCard } from "./WeeklyFeedingInsightCard";
 import { WeeklyInsightsChart } from "./WeeklyInsightsChart";
 import { MoodCheckin } from "./MoodCheckin";
 
@@ -180,6 +181,8 @@ export function HomeScreen() {
 
         {/* Daily Report Card — directly below the greeting banner */}
         <DailyReportCard />
+
+        {!loading && <WeeklyFeedingInsightCard />}
 
         {/* Quick Log Buttons */}
         <div>
