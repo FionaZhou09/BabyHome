@@ -5,6 +5,7 @@ import {
   buildParentSupportContext,
   generateParentSupportReply,
 } from "../src/lib/agent/parent-support-agent";
+import { detectAnomalyReminders } from "../src/lib/alerts/anomaly-reminders";
 import { getPromptTemplateForEmotion } from "../src/lib/agent/prompt-templates";
 import { analyzeBabyPatterns } from "../src/lib/analytics/baby-pattern-analyzer";
 import { generateWeeklyFeedingInsight } from "../src/lib/insights/weekly-feeding-insight";
@@ -257,6 +258,41 @@ assert.equal(weeklyInsight.metrics.averageFeedingIntervalHours, 9.3);
 assert.match(weeklyInsight.title, /这周宝宝的规律/);
 assert.match(weeklyInsight.summary, /4 次喂养记录/);
 assert.match(weeklyInsight.pushText, /这周宝宝的规律/);
+
+const feedingReminder = detectAnomalyReminders(
+  [
+    { id: 1, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(12) },
+    { id: 2, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(8) },
+    { id: 3, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(4) },
+    { id: 4, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(1) },
+  ],
+  { now: new Date(baseTime) }
+);
+assert.ok(
+  feedingReminder.reminders.some((item) => item.code === "feeding-earlier-than-usual")
+);
+
+const wetDiaperReminder = detectAnomalyReminders(
+  [
+    { id: 1, userId: "demo", category: "diaper", babyAgeMonths: 4, timestamp: hoursAgo(4), diaperType: "wet" },
+    { id: 2, userId: "demo", category: "diaper", babyAgeMonths: 4, timestamp: hoursAgo(28), diaperType: "wet" },
+    { id: 3, userId: "demo", category: "diaper", babyAgeMonths: 4, timestamp: hoursAgo(32), diaperType: "wet" },
+    { id: 4, userId: "demo", category: "diaper", babyAgeMonths: 4, timestamp: hoursAgo(52), diaperType: "wet" },
+    { id: 5, userId: "demo", category: "diaper", babyAgeMonths: 4, timestamp: hoursAgo(56), diaperType: "wet" },
+  ],
+  { now: new Date(baseTime) }
+);
+assert.ok(wetDiaperReminder.reminders.some((item) => item.code === "wet-diapers-decreased"));
+
+const sleepReminder = detectAnomalyReminders(
+  [
+    { id: 1, userId: "demo", category: "sleep", babyAgeMonths: 4, timestamp: hoursAgo(31), sleepStart: hoursAgo(33), sleepEnd: hoursAgo(31) },
+    { id: 2, userId: "demo", category: "sleep", babyAgeMonths: 4, timestamp: hoursAgo(20), sleepStart: hoursAgo(22), sleepEnd: hoursAgo(20) },
+    { id: 3, userId: "demo", category: "sleep", babyAgeMonths: 4, timestamp: hoursAgo(2), sleepStart: hoursAgo(6), sleepEnd: hoursAgo(2) },
+  ],
+  { now: new Date(baseTime) }
+);
+assert.ok(sleepReminder.reminders.some((item) => item.code === "sleep-suddenly-longer"));
 
 const currentTime = Date.now();
 const relativeHoursAgo = (hours: number) =>

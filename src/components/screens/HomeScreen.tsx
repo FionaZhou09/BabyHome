@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Plus, Shield, Star, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { request } from "@/lib/api/request";
+import { AnomalyReminderCard } from "./AnomalyReminderCard";
 import { DailyReportCard } from "./DailyReportCard";
 import { WeeklyFeedingInsightCard } from "./WeeklyFeedingInsightCard";
 import { WeeklyInsightsChart } from "./WeeklyInsightsChart";
@@ -181,6 +182,8 @@ export function HomeScreen() {
 
         {/* Daily Report Card — directly below the greeting banner */}
         <DailyReportCard />
+
+        {!loading && <AnomalyReminderCard />}
 
         {!loading && <WeeklyFeedingInsightCard />}
 
