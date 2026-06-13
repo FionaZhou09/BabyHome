@@ -19,6 +19,9 @@ export interface PatternAnomaly {
 interface PatternMetric {
   count: number;
   averageIntervalHours: number | null;
+  baselineAverageIntervalHours: number | null;
+  latestIntervalHours: number | null;
+  latestIntervalTrend: "shorter" | "longer" | "similar" | null;
   maxIntervalHours: number | null;
   intervalsHours: number[];
 }
@@ -69,14 +72,37 @@ function calculateMetric(activities: DemoActivity[], category: ActivityCategory)
     .map((time, index) => roundHours((time - times[index]) / HOUR_MS));
 
   const totalIntervalHours = intervalsHours.reduce((sum, interval) => sum + interval, 0);
+  const latestIntervalHours =
+    intervalsHours.length > 0 ? intervalsHours[intervalsHours.length - 1] : null;
+  const baselineIntervals = intervalsHours.slice(0, -1);
+  const baselineAverageIntervalHours =
+    baselineIntervals.length > 0
+      ? roundHours(
+          baselineIntervals.reduce((sum, interval) => sum + interval, 0) /
+            baselineIntervals.length
+        )
+      : intervalsHours.length > 0
+      ? roundHours(totalIntervalHours / intervalsHours.length)
+      : null;
 
   return {
     count: times.length,
     averageIntervalHours:
       intervalsHours.length > 0 ? roundHours(totalIntervalHours / intervalsHours.length) : null,
+    baselineAverageIntervalHours,
+    latestIntervalHours,
+    latestIntervalTrend: intervalTrend(latestIntervalHours, baselineAverageIntervalHours),
     maxIntervalHours: intervalsHours.length > 0 ? Math.max(...intervalsHours) : null,
     intervalsHours,
   };
+}
+
+function intervalTrend(latest: number | null, baseline: number | null) {
+  if (latest === null || baseline === null) return null;
+
+  const difference = latest - baseline;
+  if (Math.abs(difference) < 0.5) return "similar";
+  return difference < 0 ? "shorter" : "longer";
 }
 
 function feedingAnomalies(metric: PatternMetric): PatternAnomaly[] {

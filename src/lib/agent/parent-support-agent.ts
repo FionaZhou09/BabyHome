@@ -1,4 +1,8 @@
 import type { DemoActivity, DemoChatMessage } from "@/lib/demo/types";
+import {
+  analyzeBabyPatterns,
+  type BabyPatternAnalysis,
+} from "@/lib/analytics/baby-pattern-analyzer";
 import type { BabyCareKnowledgeCard } from "@/lib/knowledge/baby-care-cards";
 import { retrieveKnowledgeCards } from "@/lib/knowledge/retrieve-knowledge-cards";
 import { detectEmotion, type EmotionDetectionResult } from "./emotion-detector";
@@ -34,6 +38,7 @@ export interface ParentSupportContext {
   promptTemplate: ParentSupportPromptTemplate;
   babyAgeMonths: number;
   knowledgeCards: BabyCareKnowledgeCard[];
+  patternAnalysis: BabyPatternAnalysis;
   logContext: ActivityLogContext;
   safety: SafetyCheckResult;
   intent: Intent;
@@ -181,6 +186,35 @@ function activityContextLine(activities: DemoActivity[], language: "zh" | "en") 
   return `From recent logs, I see ${counts.feeding ?? 0} feeding, ${counts.diaper ?? 0} diaper, and ${counts.sleep ?? 0} sleep entries. Logs do not need to be perfect; they are here to lower your mental load.`;
 }
 
+function patternContextLine(patternAnalysis: BabyPatternAnalysis, language: "zh" | "en") {
+  const feeding = patternAnalysis.feeding;
+  if (
+    feeding.baselineAverageIntervalHours === null ||
+    feeding.latestIntervalHours === null ||
+    feeding.latestIntervalTrend === null
+  ) {
+    return null;
+  }
+
+  if (language === "zh") {
+    const trendText =
+      feeding.latestIntervalTrend === "shorter"
+        ? "这次比平时更早，可能是提前饿了。"
+        : feeding.latestIntervalTrend === "longer"
+        ? "这次比平时间隔更长，可以结合精神状态和尿布一起看。"
+        : "这次节奏和平时差不多。";
+    return `你家宝宝最近 ${patternAnalysis.windowDays} 天喂养平均间隔约 ${feeding.baselineAverageIntervalHours} 小时；这次间隔约 ${feeding.latestIntervalHours} 小时，${trendText}`;
+  }
+
+  const trendText =
+    feeding.latestIntervalTrend === "shorter"
+      ? "this feed came earlier than their usual rhythm."
+      : feeding.latestIntervalTrend === "longer"
+      ? "this gap is longer than their usual rhythm, so compare it with alertness and diapers."
+      : "this is close to their usual rhythm.";
+  return `For your baby, the recent ${patternAnalysis.windowDays}-day average feeding interval is about ${feeding.baselineAverageIntervalHours} hours; this interval is about ${feeding.latestIntervalHours} hours, so ${trendText}`;
+}
+
 function sourceLine(cards: BabyCareKnowledgeCard[], language: "zh" | "en") {
   const labels = Array.from(
     new Set(cards.flatMap((card) => card.sources.map((source) => source.label)))
@@ -194,7 +228,8 @@ function answerFromKnowledgeCards(
   cards: BabyCareKnowledgeCard[],
   activities: DemoActivity[],
   language: "zh" | "en",
-  emotion: EmotionDetectionResult
+  emotion: EmotionDetectionResult,
+  patternAnalysis: BabyPatternAnalysis
 ) {
   const [primaryCard, secondaryCard] = cards;
   const lines = [emotionalStateLine(emotion, language), primaryCard.answer[language]];
@@ -208,6 +243,10 @@ function answerFromKnowledgeCards(
   }
 
   lines.push(activityContextLine(activities, language));
+  const patternLine = patternContextLine(patternAnalysis, language);
+  if (patternLine) {
+    lines.push(patternLine);
+  }
 
   const warningSigns = Array.from(
     new Set(cards.flatMap((card) => (card.warningSigns ? [card.warningSigns[language]] : [])))
@@ -500,6 +539,7 @@ export function buildParentSupportContext({
   const babyAgeMonths = inferBabyAgeMonths(cleanMessage, activities);
   const knowledgeCards = retrieveKnowledgeCards(cleanMessage, babyAgeMonths, 2);
   const logContext = readActivityLogContext(activities);
+  const patternAnalysis = analyzeBabyPatterns(logContext.activities, { lookbackDays: 3 });
   const safety = assessSafety(cleanMessage, emotion);
   const intent = detectIntent(cleanMessage);
 
@@ -510,6 +550,7 @@ export function buildParentSupportContext({
     promptTemplate,
     babyAgeMonths,
     knowledgeCards,
+    patternAnalysis,
     logContext,
     safety,
     intent,
@@ -523,6 +564,7 @@ function generateReplyFromContext(context: ParentSupportContext) {
     emotion,
     babyAgeMonths,
     knowledgeCards,
+    patternAnalysis,
     logContext,
     safety,
     intent,
@@ -538,7 +580,13 @@ function generateReplyFromContext(context: ParentSupportContext) {
   if (safety.status === "baby-urgent") return babyUrgentReply(language);
 
   if (knowledgeCards.length > 0) {
-    return answerFromKnowledgeCards(knowledgeCards, logContext.activities, language, emotion);
+    return answerFromKnowledgeCards(
+      knowledgeCards,
+      logContext.activities,
+      language,
+      emotion,
+      patternAnalysis
+    );
   }
 
   if (intent === "emotional") return emotionalReply(cleanMessage, logContext.activities, language);

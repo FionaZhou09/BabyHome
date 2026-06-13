@@ -240,6 +240,30 @@ const sparsePatternAnalysis = analyzeBabyPatterns(
 assert.ok(sparsePatternAnalysis.anomalies.some((item) => item.code === "feeding-insufficient-data"));
 assert.ok(sparsePatternAnalysis.anomalies.some((item) => item.code === "sleep-insufficient-data"));
 
+const currentTime = Date.now();
+const relativeHoursAgo = (hours: number) =>
+  new Date(currentTime - hours * 60 * 60 * 1000).toISOString();
+const personalizedActivities = [
+  { id: 1, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: relativeHoursAgo(2.5) },
+  { id: 2, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: relativeHoursAgo(4) },
+  { id: 3, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: relativeHoursAgo(6.5) },
+  { id: 4, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: relativeHoursAgo(9) },
+] as const;
+const personalizedPattern = analyzeBabyPatterns([...personalizedActivities], {
+  now: new Date(currentTime),
+  lookbackDays: 3,
+});
+assert.equal(personalizedPattern.feeding.baselineAverageIntervalHours, 2.5);
+assert.equal(personalizedPattern.feeding.latestIntervalHours, 1.5);
+assert.equal(personalizedPattern.feeding.latestIntervalTrend, "shorter");
+
+const personalizedReply = generateParentSupportReply({
+  message: "宝宝现在又饿了吗？",
+  activities: [...personalizedActivities],
+});
+assert.match(personalizedReply, /你家宝宝最近 3 天喂养平均间隔约 2\.5 小时/);
+assert.match(personalizedReply, /这次间隔约 1\.5 小时.*提前|这次比平时更早/);
+
 const parentSupportAgentSource = readFileSync(
   new URL("../src/lib/agent/parent-support-agent.ts", import.meta.url),
   "utf8"
