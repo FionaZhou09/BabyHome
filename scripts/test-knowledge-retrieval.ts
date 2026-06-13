@@ -75,6 +75,22 @@ assert.match(
   "Expected text age to guide sleep retrieval when logs have a different age"
 );
 
+const combinedKnowledgeReply = generateParentSupportReply({
+  message: "7个月过敏食物怎么引入？",
+  activities: [],
+});
+
+assert.match(
+  combinedKnowledgeReply,
+  /常见过敏食物可以像其他食物一样逐步引入/,
+  "Expected primary allergen card in the agent reply"
+);
+assert.match(
+  combinedKnowledgeReply,
+  /母乳或配方奶仍是主要营养来源|辅食.*练习和探索/,
+  "Expected a related second card to supplement the primary answer"
+);
+
 const parentSupportAgentSource = readFileSync(
   new URL("../src/lib/agent/parent-support-agent.ts", import.meta.url),
   "utf8"

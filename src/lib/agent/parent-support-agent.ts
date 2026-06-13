@@ -134,23 +134,41 @@ function activityContextLine(activities: DemoActivity[], language: "zh" | "en") 
   return `From recent logs, I see ${counts.feeding ?? 0} feeding, ${counts.diaper ?? 0} diaper, and ${counts.sleep ?? 0} sleep entries. Logs do not need to be perfect; they are here to lower your mental load.`;
 }
 
-function sourceLine(card: BabyCareKnowledgeCard, language: "zh" | "en") {
-  const labels = card.sources.slice(0, 2).map((source) => source.label).join(", ");
+function sourceLine(cards: BabyCareKnowledgeCard[], language: "zh" | "en") {
+  const labels = Array.from(
+    new Set(cards.flatMap((card) => card.sources.map((source) => source.label)))
+  )
+    .slice(0, 3)
+    .join(", ");
   return language === "zh" ? `参考方向：${labels}。` : `Reference direction: ${labels}.`;
 }
 
-function answerFromKnowledgeCard(
-  card: BabyCareKnowledgeCard,
+function answerFromKnowledgeCards(
+  cards: BabyCareKnowledgeCard[],
   activities: DemoActivity[],
   language: "zh" | "en"
 ) {
-  const lines = [card.answer[language], activityContextLine(activities, language)];
+  const [primaryCard, secondaryCard] = cards;
+  const lines = [primaryCard.answer[language]];
 
-  if (card.warningSigns) {
-    lines.push(card.warningSigns[language]);
+  if (secondaryCard) {
+    lines.push(
+      language === "zh"
+        ? `相关补充：${secondaryCard.answer.zh}`
+        : `Related note: ${secondaryCard.answer.en}`
+    );
   }
 
-  lines.push(sourceLine(card, language));
+  lines.push(activityContextLine(activities, language));
+
+  const warningSigns = Array.from(
+    new Set(cards.flatMap((card) => (card.warningSigns ? [card.warningSigns[language]] : [])))
+  );
+  if (warningSigns.length > 0) {
+    lines.push(warningSigns.join(" "));
+  }
+
+  lines.push(sourceLine(cards, language));
   return lines.join(" ");
 }
 
@@ -417,8 +435,10 @@ export function generateParentSupportReply({
   if (hasMatch(cleanMessage, BABY_URGENT_PATTERNS)) return babyUrgentReply(language);
 
   const babyAgeMonths = inferBabyAgeMonths(cleanMessage, activities);
-  const [knowledgeCard] = retrieveKnowledgeCards(cleanMessage, babyAgeMonths);
-  if (knowledgeCard) return answerFromKnowledgeCard(knowledgeCard, activities, language);
+  const knowledgeCards = retrieveKnowledgeCards(cleanMessage, babyAgeMonths, 2);
+  if (knowledgeCards.length > 0) {
+    return answerFromKnowledgeCards(knowledgeCards, activities, language);
+  }
 
   const intent = detectIntent(cleanMessage);
   if (intent === "emotional") return emotionalReply(cleanMessage, activities, language);
