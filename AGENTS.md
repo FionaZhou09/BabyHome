@@ -26,11 +26,11 @@ Use Node.js 20.9 or newer for Next.js 16.
 
 - `src/app/page.tsx` renders the home dashboard.
 - `src/app/onboarding/page.tsx` stores the baby profile in `localStorage`.
-- `src/app/api/activities` uses an in-memory demo store for local logging.
+- `src/app/api/activities` uses a file-backed local JSON store for local logging.
 - `src/app/api/chat` streams placeholder agent responses.
 - `src/app/api/insights` returns placeholder local insights.
 - `src/lib/agent/placeholder.ts` is the future agent integration point.
-- `src/lib/demo/store.ts` is the temporary local data store.
+- `src/lib/demo/store.ts` persists local app data to `.babyhome-data/store.json` by default.
 
 ## Coding Notes
 
