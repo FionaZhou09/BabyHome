@@ -109,6 +109,16 @@ function inferBabyAgeMonths(message: string, activities: DemoActivity[]) {
   return inferTextAgeMonths(message) ?? activities[0]?.babyAgeMonths ?? 4;
 }
 
+function formatBabyAgeLabel(babyAgeMonths: number, language: "zh" | "en") {
+  if (babyAgeMonths <= 0) {
+    return language === "zh" ? "新生儿" : "newborn";
+  }
+
+  return language === "zh"
+    ? `${babyAgeMonths} 个月宝宝`
+    : `${babyAgeMonths}-month-old babies`;
+}
+
 function activityContextLine(activities: DemoActivity[], language: "zh" | "en") {
   const { counts } = summarizeActivities(activities);
   if (activities.length === 0) {
@@ -218,14 +228,20 @@ function feedingReply(activities: DemoActivity[], language: "zh" | "en") {
   ].join(" ");
 }
 
-function sleepReply(message: string, activities: DemoActivity[], language: "zh" | "en") {
+function sleepReply(
+  message: string,
+  activities: DemoActivity[],
+  language: "zh" | "en",
+  babyAgeMonths: number
+) {
   const sleepCount = activities.filter((activity) => activity.category === "sleep").length;
   const asksAboutWaking = /wake|waking|night|醒|晚上|夜里|半夜|夜醒/i.test(message);
+  const babyAgeLabel = formatBabyAgeLabel(babyAgeMonths, language);
 
   if (language === "zh") {
     if (asksAboutWaking) {
       return [
-        "正常，4 个月宝宝晚上反复醒很常见，尤其是睡眠周期变成熟、白天刺激多、猛长期、出牙前后，或需要重新练习自己接觉的时候。",
+        `${babyAgeLabel}晚上反复醒很常见，可能和睡眠周期变化、白天刺激、猛长期、出牙前后、分离焦虑或正在练新技能有关。`,
         "你可以先不用急着追求“一觉到天亮”。更实际的是看三个信号：宝宝白天精神还可以、吃奶和尿布没有明显下降、醒来后能被安抚回去。",
         "今晚可以试一个很小的策略：睡前流程固定 10-15 分钟，夜里先等 30-60 秒观察，再用低光、低声音、轻拍或抱起放下安抚。",
         `我也会参考你的记录；目前最近 7 天里看到 ${sleepCount} 条睡眠记录。记录不用完美，只要能帮你少靠记忆硬撑就够了。`,
@@ -242,7 +258,7 @@ function sleepReply(message: string, activities: DemoActivity[], language: "zh" 
 
   if (asksAboutWaking) {
     return [
-      "Yes, frequent night waking can be very normal around 4 months. Sleep cycles are maturing, and babies may need help connecting sleep cycles again.",
+      `Yes, frequent night waking can be common for ${babyAgeLabel}. It may relate to sleep-cycle changes, daytime stimulation, growth shifts, teething, separation anxiety, or practicing new skills.`,
       "Before aiming for sleeping through the night, check the calmer signals: baby is alert enough during the day, feeding and wet diapers have not dropped, and baby can usually be soothed back down.",
       "For tonight, try one small plan: a consistent 10-15 minute bedtime routine, pause 30-60 seconds before intervening, then use low light, a quiet voice, gentle patting, or pick-up-put-down soothing.",
       `I can also use your logs as context; I see ${sleepCount} recent sleep ${sleepCount === 1 ? "log" : "logs"} in the last 7 days.`,
@@ -400,16 +416,14 @@ export function generateParentSupportReply({
   if (hasMatch(cleanMessage, PARENT_CRISIS_PATTERNS)) return parentCrisisReply(language);
   if (hasMatch(cleanMessage, BABY_URGENT_PATTERNS)) return babyUrgentReply(language);
 
-  const [knowledgeCard] = retrieveKnowledgeCards(
-    cleanMessage,
-    inferBabyAgeMonths(cleanMessage, activities)
-  );
+  const babyAgeMonths = inferBabyAgeMonths(cleanMessage, activities);
+  const [knowledgeCard] = retrieveKnowledgeCards(cleanMessage, babyAgeMonths);
   if (knowledgeCard) return answerFromKnowledgeCard(knowledgeCard, activities, language);
 
   const intent = detectIntent(cleanMessage);
   if (intent === "emotional") return emotionalReply(cleanMessage, activities, language);
   if (intent === "feeding") return feedingReply(activities, language);
-  if (intent === "sleep") return sleepReply(cleanMessage, activities, language);
+  if (intent === "sleep") return sleepReply(cleanMessage, activities, language, babyAgeMonths);
   if (intent === "diaper") {
     const diaperTopic = detectDiaperTopic(cleanMessage);
     if (diaperTopic === "poop") return poopReply(cleanMessage, language);

@@ -1,4 +1,5 @@
 import { strict as assert } from "node:assert";
+import { readFileSync } from "node:fs";
 import { generateParentSupportReply } from "../src/lib/agent/parent-support-agent";
 import { retrieveKnowledgeCards } from "../src/lib/knowledge/retrieve-knowledge-cards";
 
@@ -72,6 +73,17 @@ assert.match(
   napReplyWithTextAge,
   /9-12 个月|2 个 nap|15-30 分钟/,
   "Expected text age to guide sleep retrieval when logs have a different age"
+);
+
+const parentSupportAgentSource = readFileSync(
+  new URL("../src/lib/agent/parent-support-agent.ts", import.meta.url),
+  "utf8"
+);
+
+assert.doesNotMatch(
+  parentSupportAgentSource,
+  /正常，4 个月宝宝晚上反复醒很常见|normal around 4 months/,
+  "sleep fallback should not hard-code 4 months"
 );
 
 console.log("knowledge retrieval tests passed");
