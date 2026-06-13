@@ -4,11 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Send, Star } from "lucide-react";
 import { request } from "@/lib/api/request";
+import { parseChatStreamChunk, type ChatStreamResourceNeed } from "@/lib/chat/chat-stream";
+import { CrisisResourceCard } from "./CrisisResourceCard";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+  resourceNeed?: ChatStreamResourceNeed;
 }
 
 interface ChatHistoryMessage {
@@ -81,25 +84,29 @@ export function ChatScreen() {
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value);
-          const lines = chunk.split("\n");
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
-              if (data === "[DONE]") break;
-              try {
-                const { text } = JSON.parse(data);
-                if (typeof text !== "string") continue;
-                assistantContent += text;
-                setMessages((prev) => {
-                  const updated = [...prev];
-                  updated[updated.length - 1] = {
-                    ...updated[updated.length - 1],
-                    content: assistantContent,
-                  };
-                  return updated;
-                });
-              } catch {}
+          const { events } = parseChatStreamChunk(chunk);
+          for (const event of events) {
+            if (event.type === "resource") {
+              setMessages((prev) => {
+                const updated = [...prev];
+                updated[updated.length - 1] = {
+                  ...updated[updated.length - 1],
+                  resourceNeed: event.resourceNeed,
+                };
+                return updated;
+              });
+              continue;
             }
+
+            assistantContent += event.text;
+            setMessages((prev) => {
+              const updated = [...prev];
+              updated[updated.length - 1] = {
+                ...updated[updated.length - 1],
+                content: assistantContent,
+              };
+              return updated;
+            });
           }
         }
       }
@@ -207,6 +214,9 @@ export function ChatScreen() {
                   <span>🧸</span>
                   <span>It is completely valid to feel exhausted. Deep breaths. You are surviving this perfectly.</span>
                 </div>
+              )}
+              {!isUser && msg.resourceNeed && (
+                <CrisisResourceCard resourceNeed={msg.resourceNeed} />
               )}
               <span className="text-xs font-bold text-[var(--color-text-secondary)] mt-1.5 px-2">
                 {formatTime(msg.timestamp)}

@@ -9,6 +9,7 @@ import { detectCrisisResourceNeed } from "../src/lib/agent/crisis-resources";
 import { detectAnomalyReminders } from "../src/lib/alerts/anomaly-reminders";
 import { getPromptTemplateForEmotion } from "../src/lib/agent/prompt-templates";
 import { analyzeBabyPatterns } from "../src/lib/analytics/baby-pattern-analyzer";
+import { parseChatStreamChunk } from "../src/lib/chat/chat-stream";
 import { generateWeeklyFeedingInsight } from "../src/lib/insights/weekly-feeding-insight";
 import { retrieveKnowledgeCards } from "../src/lib/knowledge/retrieve-knowledge-cards";
 
@@ -215,6 +216,19 @@ const postpartumResourceReply = generateParentSupportReply({
 assert.match(postpartumResourceReply, /1-833-TLC-MAMA/);
 assert.match(postpartumResourceReply, /988/);
 assert.match(postpartumResourceReply, /不是坏父母|不是你的错/);
+
+const parsedResourceStream = parseChatStreamChunk(
+  [
+    "event: resource",
+    'data: {"level":"maternal-support","resources":[{"name":"988 Suicide & Crisis Lifeline","phone":"988","description":"crisis support","url":"https://988lifeline.org/"},{"name":"National Maternal Mental Health Hotline","phone":"1-833-TLC-MAMA","description":"maternal support","url":"https://mchb.hrsa.gov/programs-impact/national-maternal-mental-health-hotline"}]}',
+    "",
+    'data: {"text":"请先找真人陪你。"}',
+    "",
+  ].join("\n")
+);
+assert.equal(parsedResourceStream.events[0]?.type, "resource");
+assert.equal(parsedResourceStream.events[1]?.type, "text");
+assert.equal(parsedResourceStream.events[0]?.resourceNeed.resources[0].phone, "988");
 
 const collapsingPrompt = getPromptTemplateForEmotion("collapsing");
 assert.match(collapsingPrompt.responseOrder.zh, /共情.*信息|稳定.*信息/);
