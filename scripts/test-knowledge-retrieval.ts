@@ -96,22 +96,76 @@ assert.match(
   "Expected a related second card to supplement the primary answer"
 );
 
-assert.equal(
-  detectEmotion("我真的崩溃了，撑不住了，宝宝一直哭").emotionState,
-  "collapsing"
-);
-assert.equal(
-  detectEmotion("我有点焦虑，怕宝宝吃不够，但现在还可以").emotionState,
-  "anxious-stable"
-);
-assert.equal(
-  detectEmotion("我想学习一下7个月宝宝过敏食物怎么引入").emotionState,
-  "learning"
-);
-assert.equal(detectEmotion("我真的崩溃了，撑不住了").urgencyLevel, "high");
-assert.equal(detectEmotion("我有点焦虑但现在还可以").urgencyLevel, "medium");
-assert.equal(detectEmotion("我想学习一下辅食怎么加").urgencyLevel, "low");
-assert.equal(detectEmotion("我怕自己会伤害宝宝").urgencyLevel, "crisis");
+const emotionTestCases = [
+  {
+    message: "我真的崩溃了，撑不住了，宝宝一直哭",
+    emotionState: "collapsing",
+    urgencyLevel: "high",
+  },
+  {
+    message: "昨晚完全睡不了，我快疯了",
+    emotionState: "collapsing",
+    urgencyLevel: "high",
+  },
+  {
+    message: "我有点焦虑，怕宝宝吃不够，但现在还可以",
+    emotionState: "anxious-stable",
+    urgencyLevel: "medium",
+  },
+  {
+    message: "4个月宝宝晚上醒很多次正常吗？我有点担心",
+    emotionState: "anxious-stable",
+    urgencyLevel: "medium",
+  },
+  {
+    message: "宝宝今天尿布少一点，会不会脱水？",
+    emotionState: "anxious-stable",
+    urgencyLevel: "medium",
+  },
+  {
+    message: "我想学习一下7个月宝宝过敏食物怎么引入",
+    emotionState: "learning",
+    urgencyLevel: "low",
+  },
+  {
+    message: "新生儿一天拉多少次？",
+    emotionState: "learning",
+    urgencyLevel: "low",
+  },
+  {
+    message: "可以给我一个6个月辅食计划吗？",
+    emotionState: "learning",
+    urgencyLevel: "low",
+  },
+  {
+    message: "怎么建立睡前流程？",
+    emotionState: "learning",
+    urgencyLevel: "low",
+  },
+  {
+    message: "我怕自己会伤害宝宝",
+    emotionState: "collapsing",
+    urgencyLevel: "crisis",
+  },
+] as const;
+
+let correctEmotionDetections = 0;
+for (const testCase of emotionTestCases) {
+  const result = detectEmotion(testCase.message);
+  assert.equal(
+    result.emotionState,
+    testCase.emotionState,
+    `Expected emotionState for "${testCase.message}"`
+  );
+  assert.equal(
+    result.urgencyLevel,
+    testCase.urgencyLevel,
+    `Expected urgencyLevel for "${testCase.message}"`
+  );
+  correctEmotionDetections += 1;
+}
+
+assert.equal(correctEmotionDetections / emotionTestCases.length, 1);
 
 const collapsingReply = generateParentSupportReply({
   message: "我真的崩溃了，撑不住了，宝宝一直哭",
