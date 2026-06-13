@@ -1,7 +1,10 @@
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
 import { detectEmotion } from "../src/lib/agent/emotion-detector";
-import { generateParentSupportReply } from "../src/lib/agent/parent-support-agent";
+import {
+  buildParentSupportContext,
+  generateParentSupportReply,
+} from "../src/lib/agent/parent-support-agent";
 import { retrieveKnowledgeCards } from "../src/lib/knowledge/retrieve-knowledge-cards";
 
 function assertTopCard(question: string, babyAgeMonths: number, expectedId: string) {
@@ -119,6 +122,27 @@ assert.match(
   /先稳住|先把下一步缩小/,
   "Expected collapsing emotional state to add stabilization language"
 );
+
+const urgentPipelineContext = buildParentSupportContext({
+  message: "我怕自己会伤害宝宝，7个月宝宝过敏食物怎么引入？",
+  activities: [
+    {
+      id: 1,
+      userId: "demo",
+      category: "feeding",
+      babyAgeMonths: 7,
+      timestamp: new Date().toISOString(),
+    },
+  ],
+});
+
+assert.equal(urgentPipelineContext.emotion.urgencyLevel, "crisis");
+assert.ok(
+  urgentPipelineContext.knowledgeCards.length > 0,
+  "Expected knowledge retrieval before safety decision in the agent context"
+);
+assert.equal(urgentPipelineContext.logContext.summary.counts.feeding, 1);
+assert.equal(urgentPipelineContext.safety.status, "parent-crisis");
 
 const parentSupportAgentSource = readFileSync(
   new URL("../src/lib/agent/parent-support-agent.ts", import.meta.url),
