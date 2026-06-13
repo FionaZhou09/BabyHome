@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Send, Star } from "lucide-react";
 import { request } from "@/lib/api/request";
 import { parseChatStreamChunk, type ChatStreamResourceNeed } from "@/lib/chat/chat-stream";
+import { ChatHeader } from "./ChatHeader";
+import { AssistantVoiceButton } from "./AssistantVoiceButton";
+import { ChatInputBar } from "./ChatInputBar";
 import { CrisisResourceCard } from "./CrisisResourceCard";
 
 interface Message {
@@ -134,31 +136,7 @@ export function ChatScreen() {
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--color-accent)] overflow-hidden">
-      {/* Header */}
-      <div
-        className="w-full bg-[#ebf7f2] border-b-2 border-[var(--color-border)] px-5 py-4 flex items-center justify-between shrink-0 z-20 sticky top-0"
-        style={{ boxShadow: "0 2px 8px rgba(31,84,65,0.06)" }}
-      >
-        <div className="flex items-center gap-3 w-full">
-          <div
-            className="h-10 w-10 rounded-xl bg-[var(--color-secondary)] flex shrink-0 items-center justify-center border-2 border-[var(--color-border)]"
-            style={{ boxShadow: "2px 2px 0px var(--color-border)" }}
-          >
-            <Star className="w-5 h-5 text-white" strokeWidth={2.5} />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-heading text-[15px] font-bold text-[#1f5441] leading-tight">
-              Midnight Companion
-            </h3>
-            <p className="text-[11px] text-[#29745a] font-bold tracking-wide uppercase mt-0.5">
-              No judgment answers
-            </p>
-          </div>
-          <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white text-[#307b60] border-2 border-[var(--color-secondary)] flex shrink-0">
-            Online
-          </span>
-        </div>
-      </div>
+      <ChatHeader />
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto w-full p-5 space-y-5 flex flex-col items-stretch">
@@ -215,6 +193,7 @@ export function ChatScreen() {
                   <span>It is completely valid to feel exhausted. Deep breaths. You are surviving this perfectly.</span>
                 </div>
               )}
+              {!isUser && msg.content && <AssistantVoiceButton text={msg.content} />}
               {!isUser && msg.resourceNeed && (
                 <CrisisResourceCard resourceNeed={msg.resourceNeed} />
               )}
@@ -258,26 +237,7 @@ export function ChatScreen() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Bar */}
-      <div className="bg-white border-t-2 border-[var(--color-border)] p-4 flex gap-3 items-center shrink-0 w-full z-20 sticky bottom-0">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Type an anxious question here..."
-          className="flex-1 bg-[var(--color-accent)] rounded-xl border-2 border-[var(--color-text-muted)] px-4 py-3.5 text-sm font-bold outline-none focus:border-[var(--color-border)] transition-all text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)]"
-        />
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={handleSend}
-          disabled={!input.trim()}
-          className="bg-[var(--color-secondary)] text-white border-2 border-[var(--color-border)] h-[52px] w-[52px] flex shrink-0 items-center justify-center rounded-xl disabled:opacity-40"
-          style={{ boxShadow: "2px 2px 0px var(--color-border)" }}
-        >
-          <Send className="w-5 h-5" strokeWidth={2.5} />
-        </motion.button>
-      </div>
+      <ChatInputBar input={input} onInputChange={setInput} onSend={handleSend} />
     </div>
   );
 }
