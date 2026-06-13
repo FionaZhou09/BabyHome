@@ -130,8 +130,8 @@ export function ChatScreen() {
     const d = new Date(iso);
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
-    if (diffMs < 60000) return "Just now";
-    return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+    if (diffMs < 60000) return "刚刚";
+    return d.toLocaleTimeString("zh-CN", { hour: "numeric", minute: "2-digit", hour12: false });
   }
 
   return (
@@ -151,15 +151,15 @@ export function ChatScreen() {
                 borderRadius: "20px 20px 20px 4px",
               }}
             >
-              Hi there, brave parent. I&apos;m your cozy companion. Ask me anything at all. Is your
-              baby sleeping differently? Unsure about feeding quantities? I&apos;m here.
+              你好，辛苦的爸爸妈妈。我会在这里陪你把问题理清。宝宝睡得不一样了？
+              不确定今天吃得够不够？都可以直接问我。
             </div>
             <div className="mt-2 p-3 rounded-[12px] bg-emerald-50 border-2 border-[var(--color-secondary)]/30 text-[12px] font-semibold text-[#256851] italic flex gap-2">
               <span>🧸</span>
-              <span>Remember: You are doing an amazing job. No one knows your baby like you do.</span>
+              <span>记得：你已经做得很好了。没有人比你更了解自己的宝宝。</span>
             </div>
             <span className="text-xs font-bold text-[var(--color-text-secondary)] mt-1.5 px-2">
-              Now
+              现在
             </span>
           </div>
         )}
@@ -190,7 +190,7 @@ export function ChatScreen() {
               {!isUser && msg.content && i === messages.length - 1 && (
                 <div className="mt-2 p-3 rounded-[12px] bg-emerald-50 border-2 border-[var(--color-secondary)]/30 text-[12px] font-semibold text-[#256851] italic flex gap-2 max-w-full">
                   <span>🧸</span>
-                  <span>It is completely valid to feel exhausted. Deep breaths. You are surviving this perfectly.</span>
+                  <span>觉得累是完全正常的。先慢慢呼吸一下，你正在很认真地撑过这一小段。</span>
                 </div>
               )}
               {!isUser && msg.content && <AssistantVoiceButton text={msg.content} />}
@@ -229,7 +229,7 @@ export function ChatScreen() {
               ))}
             </div>
             <span className="text-[11px] font-bold text-[var(--color-secondary)] mt-1.5 px-2 flex items-center gap-1.5">
-              <span className="font-heading">Drafting kindness...</span>
+              <span className="font-heading">正在认真回复...</span>
             </span>
           </motion.div>
         )}

@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 
 // Realistic mock data for a 4-month-old over the past 7 days
 const weekData = [
-  { day: "Mon", sleepHours: 13.5, feedCount: 7 },
-  { day: "Tue", sleepHours: 14.0, feedCount: 6 },
-  { day: "Wed", sleepHours: 12.5, feedCount: 8 },
-  { day: "Thu", sleepHours: 14.5, feedCount: 6 },
-  { day: "Fri", sleepHours: 13.0, feedCount: 7 },
-  { day: "Sat", sleepHours: 15.0, feedCount: 6 },
-  { day: "Sun", sleepHours: 14.5, feedCount: 7 }, // today
+  { day: "周一", sleepHours: 13.5, feedCount: 7 },
+  { day: "周二", sleepHours: 14.0, feedCount: 6 },
+  { day: "周三", sleepHours: 12.5, feedCount: 8 },
+  { day: "周四", sleepHours: 14.5, feedCount: 6 },
+  { day: "周五", sleepHours: 13.0, feedCount: 7 },
+  { day: "周六", sleepHours: 15.0, feedCount: 6 },
+  { day: "周日", sleepHours: 14.5, feedCount: 7 }, // today
 ];
 
 const MAX_HOURS = 16;
-const insight = "Sleep has been improving steadily this week — you're finding your rhythm 🌙";
+const insight = "这周睡眠在慢慢稳定，你们正在慢慢找到节奏。";
 
 export function WeeklyInsightsChart() {
   const todayIdx = weekData.length - 1;
@@ -30,10 +30,10 @@ export function WeeklyInsightsChart() {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h4 className="font-heading text-[15px] font-bold text-[var(--color-text-primary)]">
-          This Week at a Glance
+          这周一眼看懂
         </h4>
         <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-accent)] border border-[var(--color-border)] px-2.5 py-1 rounded-md">
-          7 Days
+          7 天
         </span>
       </div>
 
@@ -88,7 +88,7 @@ export function WeeklyInsightsChart() {
                   color: isToday ? "var(--color-primary)" : "var(--color-text-secondary)",
                 }}
               >
-                {isToday ? "Today" : d.day}
+                {isToday ? "今天" : d.day}
               </span>
             </div>
           );
@@ -99,11 +99,11 @@ export function WeeklyInsightsChart() {
       <div className="flex items-center gap-4 mb-4">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-sm bg-[var(--color-primary)]" />
-          <span className="text-[11px] text-[var(--color-text-secondary)] font-medium">Sleep (hrs)</span>
+          <span className="text-[11px] text-[var(--color-text-secondary)] font-medium">睡眠（小时）</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-[#5dcaa5]" />
-          <span className="text-[11px] text-[var(--color-text-secondary)] font-medium">Feedings</span>
+          <span className="text-[11px] text-[var(--color-text-secondary)] font-medium">喂养</span>
         </div>
       </div>
 

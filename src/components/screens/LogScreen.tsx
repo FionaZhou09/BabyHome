@@ -8,10 +8,10 @@ import { request } from "@/lib/api/request";
 import { toast } from "sonner";
 
 const categories = [
-  { key: "feeding", label: "Feed", icon: Plus, bg: "#fff8f5", color: "#f0997b" },
-  { key: "diaper", label: "Diaper", icon: Shield, bg: "#f5fcfa", color: "#5dcaa5" },
-  { key: "sleep", label: "Sleep", icon: Star, bg: "#fff8f5", color: "#f0997b" },
-  { key: "pumping", label: "Pump", icon: Plus, bg: "#fffbf4", color: "#e6b875" },
+  { key: "feeding", label: "喂养", icon: Plus, bg: "#fff8f5", color: "#f0997b" },
+  { key: "diaper", label: "尿布", icon: Shield, bg: "#f5fcfa", color: "#5dcaa5" },
+  { key: "sleep", label: "睡眠", icon: Star, bg: "#fff8f5", color: "#f0997b" },
+  { key: "pumping", label: "吸奶", icon: Plus, bg: "#fffbf4", color: "#e6b875" },
 ];
 
 type ActivityPayload = {
@@ -44,21 +44,21 @@ export function LogScreen() {
   // Shared: log timestamp (default = now)
   const [logTime, setLogTime] = useState<Date>(new Date());
 
-  // Feeding state
+  // 喂养状态
   const [feedingMethod, setFeedingMethod] = useState<"nursing" | "expressed" | "formula">("nursing");
   const [feedingSide, setFeedingSide] = useState<"left" | "right" | "both">("left");
   const [feedingDurationMin, setFeedingDurationMin] = useState(15);
   const [formulaAmount, setFormulaAmount] = useState(3.0);
 
-  // Diaper state
+  // 尿布状态
   const [diaperType, setDiaperType] = useState<"wet" | "dirty" | "mix" | "dry">("wet");
 
-  // Sleep state
+  // 睡眠状态
   const [sleepLocation, setSleepLocation] = useState<"crib" | "bassinet" | "contact">("crib");
   const [sleepStart, setSleepStart] = useState<Date>(() => { const d = new Date(); d.setHours(d.getHours() - 2); return d; });
   const [sleepEnd, setSleepEnd] = useState<Date>(new Date());
 
-  // Pumping state
+  // 吸奶状态
   const [pumpingDuration, setPumpingDuration] = useState(15);
   const [pumpingLeftAmount, setPumpingLeftAmount] = useState(2);
   const [pumpingRightAmount, setPumpingRightAmount] = useState(2);
@@ -106,18 +106,18 @@ export function LogScreen() {
         body: JSON.stringify(payload),
       });
 
-      toast.success("Activity logged!");
+      toast.success("记录已保存");
       router.push("/");
     } catch (err) {
       console.error("Failed to log activity", err);
-      toast.error("Failed to save log");
+      toast.error("保存失败，请再试一次");
     } finally {
       setLoading(false);
     }
   }
 
   function fmtTime(d: Date): string {
-    return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+    return d.toLocaleTimeString("zh-CN", { hour: "numeric", minute: "2-digit", hour12: false });
   }
 
   function applyTimeString(base: Date, hhmm: string): Date {
@@ -131,7 +131,7 @@ export function LogScreen() {
   function TimePill({ value, onChange }: { value: Date; onChange: (d: Date) => void }) {
     const [open, setOpen] = useState(false);
     const hhmm = value.toTimeString().slice(0, 5);
-    const isNow = Math.abs(new Date().getTime() - value.getTime()) < 90000; // within 90s = "Now"
+    const isNow = Math.abs(new Date().getTime() - value.getTime()) < 90000;
     return (
       <div className="space-y-2">
         <motion.button
@@ -143,10 +143,10 @@ export function LogScreen() {
         >
           <ClockIcon className="w-4 h-4 shrink-0" style={{ color: "var(--color-primary)" }} strokeWidth={2.5} />
           <span className="font-heading text-sm font-bold text-[var(--color-text-primary)] flex-1 text-left">
-            {isNow ? `Now · ${fmtTime(value)}` : fmtTime(value)}
+            {isNow ? `现在 · ${fmtTime(value)}` : fmtTime(value)}
           </span>
           <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
-            {open ? "Done" : "Edit"}
+            {open ? "完成" : "修改"}
           </span>
         </motion.button>
         <AnimatePresence>
@@ -171,7 +171,7 @@ export function LogScreen() {
     );
   }
 
-  /** Inline time field used for Sleep start/end — always visible */
+  /** 睡眠开始/结束时间的固定输入框 */
   function TimeInput({ label, value, onChange }: { label: string; value: Date; onChange: (d: Date) => void }) {
     const hhmm = value.toTimeString().slice(0, 5);
     return (
@@ -195,18 +195,18 @@ export function LogScreen() {
     if (activeCategory === "feeding") {
       return (
         <>
-          {/* Time */}
+          {/* 时间 */}
           <div>
             <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
-              Time
+              时间
             </label>
             <TimePill value={logTime} onChange={setLogTime} />
           </div>
 
-          {/* Feeding Method — Nursing / Expressed / Formula Supplements */}
+          {/* 喂养方式 */}
           <div>
             <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-              Feeding Method
+              喂养方式
             </label>
             <div className="grid grid-cols-3 gap-3">
               <motion.button
@@ -218,7 +218,7 @@ export function LogScreen() {
                     : "bg-white text-[var(--color-text-primary)] border-[var(--color-border)] shadow-sm opacity-80"
                 }`}
               >
-                Nursing
+                亲喂
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -229,7 +229,7 @@ export function LogScreen() {
                     : "bg-white text-[var(--color-text-primary)] border-[var(--color-border)] shadow-sm opacity-80"
                 }`}
               >
-                Expressed
+                瓶喂母乳
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -240,7 +240,7 @@ export function LogScreen() {
                     : "bg-white text-[var(--color-text-primary)] border-[var(--color-border)] shadow-sm opacity-80"
                 }`}
               >
-                Formula
+                配方奶
               </motion.button>
             </div>
           </div>
@@ -249,7 +249,7 @@ export function LogScreen() {
             <>
               <div>
                 <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-                  Breast Side
+                  喂奶侧
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <motion.button
@@ -261,7 +261,7 @@ export function LogScreen() {
                         : "bg-white text-[var(--color-text-primary)] border-[var(--color-border)] shadow-sm opacity-80"
                     }`}
                   >
-                    Left
+                    左侧
                   </motion.button>
                   <motion.button
                     whileTap={{ scale: 0.95 }}
@@ -272,7 +272,7 @@ export function LogScreen() {
                         : "bg-white text-[var(--color-text-primary)] border-[var(--color-border)] shadow-sm opacity-80"
                     }`}
                   >
-                    Right
+                    右侧
                   </motion.button>
                   <motion.button
                     whileTap={{ scale: 0.95 }}
@@ -283,14 +283,14 @@ export function LogScreen() {
                         : "bg-white text-[var(--color-text-primary)] border-[var(--color-border)] shadow-sm opacity-80"
                     }`}
                   >
-                    Both Sides
+                    双侧
                   </motion.button>
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-                  Duration (minutes)
+                  时长（分钟）
                 </label>
                 <div className="flex items-center gap-5 bg-white p-5 rounded-[20px] border-2 border-[var(--color-border)] shadow-[4px_4px_0px_var(--color-border)] relative">
                   <motion.button
@@ -323,7 +323,7 @@ export function LogScreen() {
           {feedingMethod === "formula" && (
             <div>
               <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-                Formula Amount
+                配方奶量
               </label>
               <div className="flex items-center gap-5 bg-white p-5 rounded-[20px] border-2 border-[var(--color-border)] shadow-[4px_4px_0px_var(--color-border)] relative">
                 <motion.button
@@ -358,22 +358,22 @@ export function LogScreen() {
     if (activeCategory === "diaper") {
       return (
         <div className="space-y-5">
-          {/* Time */}
+          {/* 时间 */}
           <div>
             <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
-              Time
+              时间
             </label>
             <TimePill value={logTime} onChange={setLogTime} />
           </div>
 
-          {/* Type — Wet / Dirty / Mix / Dry */}
+          {/* 尿布类型 */}
           <div>
             <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-              Diaper Type
+              尿布类型
             </label>
             <div className="grid grid-cols-2 gap-3">
               {(["wet", "dirty", "mix", "dry"] as const).map((type) => {
-                const labels: Record<string, string> = { wet: "Wet 💧", dirty: "Dirty 💩", mix: "Mix", dry: "Dry" };
+                const labels: Record<string, string> = { wet: "湿尿布", dirty: "大便", mix: "大小便", dry: "干尿布" };
                 return (
                   <motion.button
                     key={type}
@@ -398,14 +398,14 @@ export function LogScreen() {
     if (activeCategory === "sleep") {
       return (
         <>
-          {/* Location */}
+          {/* 睡眠位置 */}
           <div>
             <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-              Sleep Location
+              睡眠位置
             </label>
             <div className="grid grid-cols-2 gap-3">
               {(["crib", "bassinet", "contact"] as const).map((loc) => {
-                const labels: Record<string, string> = { crib: "Crib", bassinet: "Bassinet", contact: "Contact Nap" };
+                const labels: Record<string, string> = { crib: "婴儿床", bassinet: "摇篮", contact: "抱睡/陪睡" };
                 return (
                   <motion.button
                     key={loc}
@@ -424,18 +424,18 @@ export function LogScreen() {
             </div>
           </div>
 
-          {/* Start + End time */}
+          {/* 开始和结束时间 */}
           <div>
             <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-              Sleep Window
+              睡眠时间段
             </label>
             <div className="flex gap-3">
-              <TimeInput label="Start" value={sleepStart} onChange={setSleepStart} />
-              <TimeInput label="End" value={sleepEnd} onChange={setSleepEnd} />
+              <TimeInput label="开始" value={sleepStart} onChange={setSleepStart} />
+              <TimeInput label="结束" value={sleepEnd} onChange={setSleepEnd} />
             </div>
           </div>
 
-          {/* Auto-calculated duration */}
+          {/* 自动计算时长 */}
           {(() => {
             const diffMs = sleepEnd.getTime() - sleepStart.getTime();
             const diffMin = Math.round(diffMs / 60000);
@@ -445,7 +445,7 @@ export function LogScreen() {
             return (
               <div className="flex items-center justify-between bg-white border-2 border-[var(--color-border)] rounded-xl px-4 py-3"
                 style={{ boxShadow: "2px 2px 0px var(--color-border)" }}>
-                <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">Duration</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">睡了多久</span>
                 <span className="font-heading text-base font-bold text-[var(--color-primary)]">{label}</span>
               </div>
             );
@@ -457,17 +457,17 @@ export function LogScreen() {
     if (activeCategory === "pumping") {
       return (
         <>
-          {/* Time */}
+          {/* 时间 */}
           <div>
             <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
-              Time
+              时间
             </label>
             <TimePill value={logTime} onChange={setLogTime} />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-              Pumping Duration (minutes)
+              吸奶时长（分钟）
             </label>
             <div className="flex items-center gap-5 bg-white p-5 rounded-[20px] border-2 border-[var(--color-border)] shadow-[4px_4px_0px_var(--color-border)]">
               <motion.button
@@ -497,7 +497,7 @@ export function LogScreen() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-                Left (oz)
+                左侧（oz）
               </label>
               <div className="flex items-center gap-2 bg-white p-3 rounded-xl border-2 border-[var(--color-border)]">
                 <motion.button
@@ -521,7 +521,7 @@ export function LogScreen() {
             </div>
             <div>
               <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-                Right (oz)
+                右侧（oz）
               </label>
               <div className="flex items-center gap-2 bg-white p-3 rounded-xl border-2 border-[var(--color-border)]">
                 <motion.button
@@ -551,13 +551,13 @@ export function LogScreen() {
     return (
       <div className="flex-1 pb-4">
         <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-          Activity Notes
+          备注
         </label>
         <textarea
           value={otherNote}
           onChange={(e) => setOtherNote(e.target.value)}
           className="w-full h-[160px] bg-white rounded-[20px] border-2 border-[var(--color-border)] p-4 text-sm font-medium text-[var(--color-text-primary)] outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 placeholder:text-[var(--color-text-muted)] resize-none"
-          placeholder="Tummy time, bath, medicine..."
+          placeholder="趴玩、洗澡、用药..."
         />
       </div>
     );
@@ -571,7 +571,7 @@ export function LogScreen() {
         style={{ boxShadow: "0 2px 8px rgba(93,75,62,0.08)" }}
       >
         <h1 className="font-heading text-[16px] font-bold tracking-tight text-[var(--color-text-primary)]">
-          Log Live Activity
+          记录照护
         </h1>
       </div>
 
@@ -621,13 +621,13 @@ export function LogScreen() {
           {renderForm()}
           <div className="flex-1 pb-4">
             <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-3">
-              Activity Notes
+              备注
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full h-[100px] bg-white rounded-[20px] border-2 border-[var(--color-border)] p-4 text-sm font-medium text-[var(--color-text-primary)] outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 placeholder:text-[var(--color-text-muted)] resize-none"
-              placeholder="Clustered feeding, feeling sleepy..."
+              placeholder="比如密集吃奶、今天很困、吐奶一点点..."
             />
           </div>
         </motion.div>
@@ -642,7 +642,7 @@ export function LogScreen() {
           className="w-full h-14 bg-[var(--color-primary)] text-white border-2 border-[var(--color-border)] font-heading font-bold rounded-[16px] text-center text-[15px] disabled:opacity-50"
           style={{ boxShadow: "4px 4px 0px var(--color-border)" }}
         >
-          {loading ? "Saving..." : "✓ Record Safe Log Entry"}
+          {loading ? "保存中..." : "✓ 保存这条记录"}
         </motion.button>
       </div>
     </div>

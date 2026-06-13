@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 type Mood = "exhausted" | "managing" | "good" | null;
 
 const moods: { key: Mood & string; emoji: string; label: string }[] = [
-  { key: "exhausted", emoji: "😴", label: "Exhausted" },
-  { key: "managing", emoji: "🙂", label: "Managing" },
-  { key: "good", emoji: "😊", label: "Good" },
+  { key: "exhausted", emoji: "😴", label: "很累" },
+  { key: "managing", emoji: "🙂", label: "还能撑住" },
+  { key: "good", emoji: "😊", label: "还可以" },
 ];
 
 export function MoodCheckin({
@@ -61,7 +61,7 @@ export function MoodCheckin({
                 exit={{ opacity: 0 }}
               >
                 <h4 className="font-heading text-[15px] font-bold text-[var(--color-text-primary)] mb-4">
-                  How are you feeling today?
+                  你今天感觉怎么样？
                 </h4>
                 <div className="flex gap-3">
                   {moods.map((m) => (
@@ -88,7 +88,7 @@ export function MoodCheckin({
                 className="text-center py-2"
               >
                 <p className="text-[14px] font-medium text-[var(--color-text-secondary)] leading-relaxed">
-                  Thanks for checking in. The AI will keep that in mind 💛
+                  谢谢你告诉我。AI 会把你的状态也考虑进去。
                 </p>
               </motion.div>
             )}

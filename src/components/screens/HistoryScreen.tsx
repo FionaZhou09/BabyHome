@@ -29,14 +29,14 @@ const categoryColors: Record<string, string> = {
 };
 
 const categoryLabels: Record<string, string> = {
-  feeding: "Feeding",
-  diaper: "Diaper Check",
-  sleep: "Sleep Focus",
-  pumping: "Pumping Prep",
-  other: "Activity",
+  feeding: "喂养",
+  diaper: "尿布",
+  sleep: "睡眠",
+  pumping: "吸奶",
+  other: "活动",
 };
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const DAYS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 
 export function HistoryScreen() {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -58,22 +58,29 @@ export function HistoryScreen() {
 
   function formatTitle(a: Activity): string {
     if (a.category === "feeding") {
-      const side = a.feedingSide ? ` (${a.feedingSide.charAt(0).toUpperCase() + a.feedingSide.slice(1)} Side)` : "";
-      const dur = a.feedingDuration ? ` - ${a.feedingDuration} Mins` : "";
-      return `Breast${side}${dur}`;
+      const sideLabels: Record<string, string> = { left: "左侧", right: "右侧", both: "双侧" };
+      const side = a.feedingSide ? `（${sideLabels[a.feedingSide] || a.feedingSide}）` : "";
+      const dur = a.feedingDuration ? ` · ${a.feedingDuration} 分钟` : "";
+      return `母乳${side}${dur}`;
     }
-    if (a.category === "diaper") return `${a.diaperType?.charAt(0).toUpperCase()}${a.diaperType?.slice(1) || "Wet"} Diaper Change`;
-    if (a.category === "sleep") return `Rest - ${a.sleepLocation ? a.sleepLocation.charAt(0).toUpperCase() + a.sleepLocation.slice(1) : "Crib"}`;
+    if (a.category === "diaper") {
+      const diaperLabels: Record<string, string> = { wet: "湿尿布", dirty: "大便", mix: "大小便", dry: "干尿布" };
+      return `${diaperLabels[a.diaperType || "wet"] || "尿布"}记录`;
+    }
+    if (a.category === "sleep") {
+      const sleepLabels: Record<string, string> = { crib: "婴儿床", bassinet: "摇篮", contact: "抱睡/陪睡" };
+      return `睡眠 · ${sleepLabels[a.sleepLocation || "crib"] || "婴儿床"}`;
+    }
     if (a.category === "pumping") {
       const total = ((a.pumpingLeftAmount || 0) + (a.pumpingRightAmount || 0)) / 30;
-      return `Expressing Session${total > 0 ? ` - ${total.toFixed(1)} oz` : ""}`;
+      return `吸奶记录${total > 0 ? ` · ${total.toFixed(1)} oz` : ""}`;
     }
-    return a.otherNote || "Activity note";
+    return a.otherNote || "活动备注";
   }
 
   function formatTimestamp(iso: string, category: string): string {
     const d = new Date(iso);
-    const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+    const time = d.toLocaleTimeString("zh-CN", { hour: "numeric", minute: "2-digit", hour12: false });
     return `${time} • ${categoryLabels[category] || category}`;
   }
 
@@ -117,7 +124,7 @@ export function HistoryScreen() {
         style={{ boxShadow: "0 2px 8px rgba(93,75,62,0.08)" }}
       >
         <h1 className="font-heading text-[16px] font-bold tracking-tight text-[var(--color-text-primary)]">
-          7-Day Log Sheet
+          7 天记录
         </h1>
       </div>
 
@@ -133,10 +140,10 @@ export function HistoryScreen() {
           <div className="flex items-center justify-between pb-4 border-b-2 border-[var(--color-primary)]/20 mb-4">
             <h4 className="font-heading text-sm font-bold text-[#f1744d] flex items-center gap-2 uppercase tracking-wide">
               <Calendar className="w-4 h-4" strokeWidth={2.5} />
-              7-Day Activity Digest
+              7 天照护摘要
             </h4>
             <span className="bg-[#ebf7f2] text-[#297c61] border-2 border-[var(--color-secondary)]/40 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md">
-              {feedingCount > 0 ? "Consistent" : "Starting out"}
+              {feedingCount > 0 ? "有规律" : "刚开始"}
             </span>
           </div>
           <div className="grid grid-cols-7 gap-2 w-full text-center">
@@ -179,10 +186,10 @@ export function HistoryScreen() {
         >
           <div className="flex justify-between items-center mb-6">
             <h4 className="font-heading text-[15px] font-bold text-[var(--color-text-primary)]">
-              Long-form Daily Activity
+              每日照护时间线
             </h4>
             <span className="text-[10px] bg-[var(--color-text-muted)]/50 border border-[var(--color-border)]/20 px-2.5 py-1 rounded-md font-bold text-[var(--color-text-secondary)] uppercase tracking-wide">
-              Past 7 Days
+              最近 7 天
             </span>
           </div>
 
@@ -198,7 +205,7 @@ export function HistoryScreen() {
           ) : activities.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-[var(--color-text-secondary)] font-medium text-sm">
-                No activities logged yet. Start by tapping a category on the home screen!
+                还没有照护记录。可以先回到首页点一个分类开始。
               </p>
             </div>
           ) : (

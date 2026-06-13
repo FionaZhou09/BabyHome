@@ -3,16 +3,16 @@
 import { motion } from "framer-motion";
 import { CheckCircle, AlertCircle } from "lucide-react";
 
-// Normal ranges for a 4-month-old
-// Sleep: 12–16 hrs/day ✓   Feedings: 5–8x/day ✓   Diapers: 6–10x/day ✓
+// 4 个月宝宝的常见参考范围
+// 睡眠：12-16 小时/天；喂养：5-8 次/天；尿布：6-10 次/天
 const todayMetrics = {
-  sleep: { value: "14.5 hrs", label: "Sleep", status: "ok" as const },
-  feeding: { value: "6x", label: "Feeding", status: "ok" as const },
-  diapers: { value: "8x", label: "Diapers", status: "ok" as const },
+  sleep: { value: "14.5 小时", label: "睡眠", status: "ok" as const },
+  feeding: { value: "6 次", label: "喂养", status: "ok" as const },
+  diapers: { value: "8 次", label: "尿布", status: "ok" as const },
 };
 
 const aiSentence =
-  "Everything is on track today. Baby is eating and sleeping just like a healthy 4-month-old should. You are doing wonderfully.";
+  "今天整体看起来很稳定。宝宝吃和睡都在一个让人安心的范围里，你已经做得很好了。";
 
 export function DailyReportCard() {
   return (
@@ -28,7 +28,7 @@ export function DailyReportCard() {
     >
       {/* Title */}
       <h4 className="font-heading text-[15px] font-bold text-[var(--color-text-primary)] mb-4">
-        Leo&apos;s Daily Summary
+        Leo 今日小结
       </h4>
 
       {/* Metric pills */}

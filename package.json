@@ -11,6 +11,7 @@
     "test:knowledge": "bun scripts/test-knowledge-retrieval.ts",
     "test:store": "bun scripts/test-local-store.ts",
     "test:speech": "bun scripts/test-speech.ts",
+    "test:copy": "bun scripts/test-ui-copy.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun src/lib/db/migrate.ts",
     "db:push": "drizzle-kit push",

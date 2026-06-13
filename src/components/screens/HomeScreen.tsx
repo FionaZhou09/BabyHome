@@ -30,10 +30,10 @@ interface Insight {
 }
 
 const categoryConfig = {
-  feeding: { bg: "#fff8f5", color: "#f0997b", icon: Plus, label: "Feeding" },
-  diaper: { bg: "#f5fcfa", color: "#5dcaa5", icon: Shield, label: "Diaper" },
-  sleep: { bg: "#fff8f5", color: "#f0997b", icon: Star, label: "Sleep" },
-  pumping: { bg: "#fffbf4", color: "#e6b875", icon: Plus, label: "Pumping" },
+  feeding: { bg: "#fff8f5", color: "#f0997b", icon: Plus, label: "喂养" },
+  diaper: { bg: "#f5fcfa", color: "#5dcaa5", icon: Shield, label: "尿布" },
+  sleep: { bg: "#fff8f5", color: "#f0997b", icon: Star, label: "睡眠" },
+  pumping: { bg: "#fffbf4", color: "#e6b875", icon: Plus, label: "吸奶" },
 };
 
 function getStoredBabyProfile() {
@@ -102,24 +102,24 @@ export function HomeScreen() {
 
   function formatActivityLabel(a: Activity): string {
     if (a.category === "feeding") {
-      const side = a.feedingSide ? ` (${a.feedingSide === "left" ? "Left" : a.feedingSide === "right" ? "Right" : "Both"} Side)` : "";
-      const duration = a.feedingDuration ? ` - ${a.feedingDuration}m` : "";
-      return `Breast${side}${duration}`;
+      const side = a.feedingSide ? `（${a.feedingSide === "left" ? "左侧" : a.feedingSide === "right" ? "右侧" : "双侧"}）` : "";
+      const duration = a.feedingDuration ? ` · ${a.feedingDuration} 分钟` : "";
+      return `母乳${side}${duration}`;
     }
     if (a.category === "sleep") {
-      return a.sleepLocation ? `Sleep - ${a.sleepLocation}` : "Sleep";
+      return a.sleepLocation ? `睡眠 · ${a.sleepLocation}` : "睡眠";
     }
     if (a.category === "diaper") {
-      return a.diaperType ? `Diaper (${a.diaperType})` : "Diaper";
+      return a.diaperType ? `尿布 · ${a.diaperType}` : "尿布";
     }
     return a.category;
   }
 
   function formatTime(iso: string): string {
-    return new Date(iso).toLocaleTimeString("en-US", {
+    return new Date(iso).toLocaleTimeString("zh-CN", {
       hour: "numeric",
       minute: "2-digit",
-      hour12: true,
+      hour12: false,
     });
   }
 
@@ -138,7 +138,7 @@ export function HomeScreen() {
             <h1 className="font-heading text-lg font-bold tracking-tight text-[var(--color-text-primary)] flex items-center gap-2">
               BabyHome{" "}
               <span className="text-[10px] bg-[var(--color-text-muted)] px-2 py-0.5 rounded-full font-body font-bold text-[var(--color-text-secondary)]">
-                AI Powered
+                AI 支持
               </span>
             </h1>
           </div>
@@ -164,7 +164,7 @@ export function HomeScreen() {
                   {babyName}
                 </h2>
                 <p className="text-sm text-[var(--color-text-secondary)] font-medium mt-0.5">
-                  {babyAge} months old
+                  {babyAge} 个月
                 </p>
               </div>
             </div>
@@ -174,7 +174,7 @@ export function HomeScreen() {
             >
               <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-secondary)] animate-pulse"></span>
               <span className="text-xs font-heading text-[var(--color-text-primary)] font-semibold">
-                Tuned In
+                已同步
               </span>
             </div>
           </div>
@@ -190,7 +190,7 @@ export function HomeScreen() {
         {/* Quick Log Buttons */}
         <div>
           <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-[var(--color-text-secondary)] mb-4">
-            Giant One-Hand Logs
+            单手快速记录
           </h3>
           <div className="grid grid-cols-2 gap-3.5">
             {Object.entries(categoryConfig).map(([key, cfg]) => (
@@ -240,7 +240,7 @@ export function HomeScreen() {
                   style={{ borderColor: "rgba(93,202,165,0.4)" }}
                 >
                   <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-secondary)]"></span>{" "}
-                  AI Reassurance
+                  安心提醒
                 </span>
                 <Star className="w-5 h-5 text-[var(--color-secondary)]" />
               </div>
@@ -255,7 +255,7 @@ export function HomeScreen() {
                 className="w-full py-3 bg-[var(--color-secondary)] text-white border-2 border-[var(--color-border)] font-heading font-bold rounded-xl text-center text-sm"
                 style={{ boxShadow: "2px 2px 0px var(--color-border)" }}
               >
-                Ask exactly how you feel
+                把现在的感受说出来
               </motion.button>
             </div>
           </motion.div>

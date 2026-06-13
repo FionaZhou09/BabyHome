@@ -7,10 +7,10 @@ import { Home, BookOpen, MessageCircle, Clock } from "lucide-react";
 import { cn } from "@/utils/utils";
 
 const tabs = [
-  { label: "Home",    href: "/",        icon: Home },
-  { label: "Log",     href: "/logs",    icon: BookOpen },
-  { label: "AI Chat", href: "/chat",    icon: MessageCircle },
-  { label: "History", href: "/history", icon: Clock },
+  { label: "首页", href: "/", icon: Home },
+  { label: "记录", href: "/logs", icon: BookOpen },
+  { label: "陪伴", href: "/chat", icon: MessageCircle },
+  { label: "历史", href: "/history", icon: Clock },
 ];
 
 /* ─── Mobile bottom tab bar ─────────────────────────────────── */
@@ -107,7 +107,7 @@ export function DesktopSidebar() {
       {/* Footer hint */}
       <div className="px-5 py-4 border-t border-[#f5c4b3]">
         <p className="text-[11px] text-[var(--color-text-muted)] font-medium leading-snug">
-          Leo · 4 months old
+          Leo · 4 个月
         </p>
       </div>
     </aside>

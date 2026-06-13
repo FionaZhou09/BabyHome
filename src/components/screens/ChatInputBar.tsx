@@ -30,7 +30,7 @@ export function ChatInputBar({ input, disabled = false, onInputChange, onSend }:
           value={input}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onSend()}
-          placeholder={speech.listening ? "正在听你说..." : "Type or speak an anxious question..."}
+          placeholder={speech.listening ? "正在听你说..." : "打字或说出你现在担心的问题..."}
           className="flex-1 min-w-0 bg-[var(--color-accent)] rounded-xl border-2 border-[var(--color-text-muted)] px-4 py-3.5 text-sm font-bold outline-none focus:border-[var(--color-border)] transition-all text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)]"
         />
         {speech.supported && (

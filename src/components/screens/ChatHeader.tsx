@@ -17,14 +17,14 @@ export function ChatHeader() {
         </div>
         <div className="flex-1">
           <h3 className="font-heading text-[15px] font-bold text-[#1f5441] leading-tight">
-            Midnight Companion
+            夜间陪伴
           </h3>
           <p className="text-[11px] text-[#29745a] font-bold tracking-wide uppercase mt-0.5">
-            No judgment answers
+            不评判，只陪你理清
           </p>
         </div>
         <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white text-[#307b60] border-2 border-[var(--color-secondary)] flex shrink-0">
-          Online
+          在线
         </span>
       </div>
     </div>
