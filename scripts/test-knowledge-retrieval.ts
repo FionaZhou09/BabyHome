@@ -6,6 +6,7 @@ import {
   generateParentSupportReply,
 } from "../src/lib/agent/parent-support-agent";
 import { getPromptTemplateForEmotion } from "../src/lib/agent/prompt-templates";
+import { analyzeBabyPatterns } from "../src/lib/analytics/baby-pattern-analyzer";
 import { retrieveKnowledgeCards } from "../src/lib/knowledge/retrieve-knowledge-cards";
 
 function assertTopCard(question: string, babyAgeMonths: number, expectedId: string) {
@@ -210,6 +211,34 @@ assert.match(anxiousPrompt.system.zh, /不要只安慰/);
 const learningPrompt = getPromptTemplateForEmotion("learning");
 assert.match(learningPrompt.responseOrder.zh, /直接.*知识/);
 assert.match(learningPrompt.system.zh, /少情绪铺垫/);
+
+const baseTime = Date.parse("2026-06-12T12:00:00.000Z");
+const hoursAgo = (hours: number) => new Date(baseTime - hours * 60 * 60 * 1000).toISOString();
+const patternAnalysis = analyzeBabyPatterns(
+  [
+    { id: 1, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(2) },
+    { id: 2, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(5) },
+    { id: 3, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(8) },
+    { id: 4, userId: "demo", category: "sleep", babyAgeMonths: 4, timestamp: hoursAgo(4), sleepStart: hoursAgo(6), sleepEnd: hoursAgo(4) },
+    { id: 5, userId: "demo", category: "sleep", babyAgeMonths: 4, timestamp: hoursAgo(14), sleepStart: hoursAgo(15), sleepEnd: hoursAgo(14) },
+    { id: 6, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(8 * 24) },
+  ],
+  { now: new Date(baseTime), lookbackDays: 7 }
+);
+
+assert.equal(patternAnalysis.windowDays, 7);
+assert.equal(patternAnalysis.feeding.count, 3);
+assert.equal(patternAnalysis.feeding.averageIntervalHours, 3);
+assert.equal(patternAnalysis.sleep.count, 2);
+assert.equal(patternAnalysis.sleep.averageIntervalHours, 9);
+assert.ok(patternAnalysis.anomalies.some((item) => item.code === "sleep-average-interval-long"));
+
+const sparsePatternAnalysis = analyzeBabyPatterns(
+  [{ id: 1, userId: "demo", category: "feeding", babyAgeMonths: 4, timestamp: hoursAgo(1) }],
+  { now: new Date(baseTime), lookbackDays: 3 }
+);
+assert.ok(sparsePatternAnalysis.anomalies.some((item) => item.code === "feeding-insufficient-data"));
+assert.ok(sparsePatternAnalysis.anomalies.some((item) => item.code === "sleep-insufficient-data"));
 
 const parentSupportAgentSource = readFileSync(
   new URL("../src/lib/agent/parent-support-agent.ts", import.meta.url),
