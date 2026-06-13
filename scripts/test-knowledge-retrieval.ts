@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
-import { classifyParentEmotionalState } from "../src/lib/agent/emotional-state-classifier";
+import { detectEmotion } from "../src/lib/agent/emotion-detector";
 import { generateParentSupportReply } from "../src/lib/agent/parent-support-agent";
 import { retrieveKnowledgeCards } from "../src/lib/knowledge/retrieve-knowledge-cards";
 
@@ -93,17 +93,21 @@ assert.match(
 );
 
 assert.equal(
-  classifyParentEmotionalState("我真的崩溃了，撑不住了，宝宝一直哭").state,
+  detectEmotion("我真的崩溃了，撑不住了，宝宝一直哭").emotionState,
   "collapsing"
 );
 assert.equal(
-  classifyParentEmotionalState("我有点焦虑，怕宝宝吃不够，但现在还可以").state,
+  detectEmotion("我有点焦虑，怕宝宝吃不够，但现在还可以").emotionState,
   "anxious-stable"
 );
 assert.equal(
-  classifyParentEmotionalState("我想学习一下7个月宝宝过敏食物怎么引入").state,
+  detectEmotion("我想学习一下7个月宝宝过敏食物怎么引入").emotionState,
   "learning"
 );
+assert.equal(detectEmotion("我真的崩溃了，撑不住了").urgencyLevel, "high");
+assert.equal(detectEmotion("我有点焦虑但现在还可以").urgencyLevel, "medium");
+assert.equal(detectEmotion("我想学习一下辅食怎么加").urgencyLevel, "low");
+assert.equal(detectEmotion("我怕自己会伤害宝宝").urgencyLevel, "crisis");
 
 const collapsingReply = generateParentSupportReply({
   message: "我真的崩溃了，撑不住了，宝宝一直哭",
