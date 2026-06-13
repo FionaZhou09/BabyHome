@@ -5,6 +5,11 @@ import {
 } from "@/lib/analytics/baby-pattern-analyzer";
 import type { BabyCareKnowledgeCard } from "@/lib/knowledge/baby-care-cards";
 import { retrieveKnowledgeCards } from "@/lib/knowledge/retrieve-knowledge-cards";
+import {
+  crisisResourceText,
+  detectCrisisResourceNeed,
+  type CrisisResourceNeed,
+} from "./crisis-resources";
 import { detectEmotion, type EmotionDetectionResult } from "./emotion-detector";
 import {
   getPromptTemplateForEmotion,
@@ -41,6 +46,7 @@ export interface ParentSupportContext {
   patternAnalysis: BabyPatternAnalysis;
   logContext: ActivityLogContext;
   safety: SafetyCheckResult;
+  crisisResourceNeed: CrisisResourceNeed;
   intent: Intent;
 }
 
@@ -91,7 +97,12 @@ function readActivityLogContext(activities: DemoActivity[]): ActivityLogContext 
 }
 
 function assessSafety(message: string, emotion: EmotionDetectionResult): SafetyCheckResult {
-  if (emotion.urgencyLevel === "crisis" || hasMatch(message, PARENT_CRISIS_PATTERNS)) {
+  const resourceNeed = detectCrisisResourceNeed(message);
+  if (
+    emotion.urgencyLevel === "crisis" ||
+    resourceNeed.level === "urgent-crisis" ||
+    hasMatch(message, PARENT_CRISIS_PATTERNS)
+  ) {
     return { status: "parent-crisis" };
   }
 
@@ -100,6 +111,17 @@ function assessSafety(message: string, emotion: EmotionDetectionResult): SafetyC
   }
 
   return { status: "ok" };
+}
+
+function withCrisisResources(
+  reply: string,
+  resourceNeed: CrisisResourceNeed,
+  language: "zh" | "en"
+) {
+  const resourceText = crisisResourceText(resourceNeed, language);
+  if (!resourceText) return reply;
+
+  return `${resourceText} ${reply}`;
 }
 
 function summarizeActivities(activities: DemoActivity[]) {
@@ -540,6 +562,7 @@ export function buildParentSupportContext({
   const knowledgeCards = retrieveKnowledgeCards(cleanMessage, babyAgeMonths, 2);
   const logContext = readActivityLogContext(activities);
   const patternAnalysis = analyzeBabyPatterns(logContext.activities, { lookbackDays: 3 });
+  const crisisResourceNeed = detectCrisisResourceNeed(cleanMessage);
   const safety = assessSafety(cleanMessage, emotion);
   const intent = detectIntent(cleanMessage);
 
@@ -553,6 +576,7 @@ export function buildParentSupportContext({
     patternAnalysis,
     logContext,
     safety,
+    crisisResourceNeed,
     intent,
   };
 }
@@ -567,6 +591,7 @@ function generateReplyFromContext(context: ParentSupportContext) {
     patternAnalysis,
     logContext,
     safety,
+    crisisResourceNeed,
     intent,
   } = context;
 
@@ -580,27 +605,73 @@ function generateReplyFromContext(context: ParentSupportContext) {
   if (safety.status === "baby-urgent") return babyUrgentReply(language);
 
   if (knowledgeCards.length > 0) {
-    return answerFromKnowledgeCards(
-      knowledgeCards,
-      logContext.activities,
-      language,
-      emotion,
-      patternAnalysis
+    return withCrisisResources(
+      answerFromKnowledgeCards(
+        knowledgeCards,
+        logContext.activities,
+        language,
+        emotion,
+        patternAnalysis
+      ),
+      crisisResourceNeed,
+      language
     );
   }
 
-  if (intent === "emotional") return emotionalReply(cleanMessage, logContext.activities, language);
-  if (intent === "feeding") return feedingReply(logContext.activities, language);
-  if (intent === "sleep") return sleepReply(cleanMessage, logContext.activities, language, babyAgeMonths);
+  if (intent === "emotional") {
+    return withCrisisResources(
+      emotionalReply(cleanMessage, logContext.activities, language),
+      crisisResourceNeed,
+      language
+    );
+  }
+  if (intent === "feeding") {
+    return withCrisisResources(
+      feedingReply(logContext.activities, language),
+      crisisResourceNeed,
+      language
+    );
+  }
+  if (intent === "sleep") {
+    return withCrisisResources(
+      sleepReply(cleanMessage, logContext.activities, language, babyAgeMonths),
+      crisisResourceNeed,
+      language
+    );
+  }
   if (intent === "diaper") {
     const diaperTopic = detectDiaperTopic(cleanMessage);
-    if (diaperTopic === "poop") return poopReply(cleanMessage, language);
-    if (diaperTopic === "pee") return wetDiaperReply(logContext.activities, language);
-    return diaperReply(logContext.activities, language);
+    if (diaperTopic === "poop") {
+      return withCrisisResources(poopReply(cleanMessage, language), crisisResourceNeed, language);
+    }
+    if (diaperTopic === "pee") {
+      return withCrisisResources(
+        wetDiaperReply(logContext.activities, language),
+        crisisResourceNeed,
+        language
+      );
+    }
+    return withCrisisResources(
+      diaperReply(logContext.activities, language),
+      crisisResourceNeed,
+      language
+    );
   }
-  if (intent === "crying") return cryingReply(language);
-  if (intent === "pattern") return patternReply(logContext.activities, language);
-  return generalReply(cleanMessage, logContext.activities, language);
+  if (intent === "crying") {
+    return withCrisisResources(cryingReply(language), crisisResourceNeed, language);
+  }
+  if (intent === "pattern") {
+    return withCrisisResources(
+      patternReply(logContext.activities, language),
+      crisisResourceNeed,
+      language
+    );
+  }
+  return withCrisisResources(
+    generalReply(cleanMessage, logContext.activities, language),
+    crisisResourceNeed,
+    language
+  );
 }
 
 export function generateParentSupportReply(input: ParentSupportInput): string {

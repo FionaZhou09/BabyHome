@@ -5,6 +5,7 @@ import {
   buildParentSupportContext,
   generateParentSupportReply,
 } from "../src/lib/agent/parent-support-agent";
+import { detectCrisisResourceNeed } from "../src/lib/agent/crisis-resources";
 import { detectAnomalyReminders } from "../src/lib/alerts/anomaly-reminders";
 import { getPromptTemplateForEmotion } from "../src/lib/agent/prompt-templates";
 import { analyzeBabyPatterns } from "../src/lib/analytics/baby-pattern-analyzer";
@@ -201,6 +202,19 @@ assert.ok(
 );
 assert.equal(urgentPipelineContext.logContext.summary.counts.feeding, 1);
 assert.equal(urgentPipelineContext.safety.status, "parent-crisis");
+
+const postpartumResourceNeed = detectCrisisResourceNeed("我产后一直很绝望，对宝宝没有感觉，也睡不着");
+assert.equal(postpartumResourceNeed.level, "maternal-support");
+assert.ok(postpartumResourceNeed.resources.some((resource) => resource.phone === "1-833-TLC-MAMA"));
+assert.ok(postpartumResourceNeed.resources.some((resource) => resource.phone === "988"));
+
+const postpartumResourceReply = generateParentSupportReply({
+  message: "我产后一直很绝望，对宝宝没有感觉，也睡不着",
+  activities: [],
+});
+assert.match(postpartumResourceReply, /1-833-TLC-MAMA/);
+assert.match(postpartumResourceReply, /988/);
+assert.match(postpartumResourceReply, /不是坏父母|不是你的错/);
 
 const collapsingPrompt = getPromptTemplateForEmotion("collapsing");
 assert.match(collapsingPrompt.responseOrder.zh, /共情.*信息|稳定.*信息/);

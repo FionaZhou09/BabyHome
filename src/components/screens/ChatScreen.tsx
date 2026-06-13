@@ -88,6 +88,7 @@ export function ChatScreen() {
               if (data === "[DONE]") break;
               try {
                 const { text } = JSON.parse(data);
+                if (typeof text !== "string") continue;
                 assistantContent += text;
                 setMessages((prev) => {
                   const updated = [...prev];
