@@ -1,5 +1,6 @@
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
+import { classifyParentEmotionalState } from "../src/lib/agent/emotional-state-classifier";
 import { generateParentSupportReply } from "../src/lib/agent/parent-support-agent";
 import { retrieveKnowledgeCards } from "../src/lib/knowledge/retrieve-knowledge-cards";
 
@@ -89,6 +90,30 @@ assert.match(
   combinedKnowledgeReply,
   /母乳或配方奶仍是主要营养来源|辅食.*练习和探索/,
   "Expected a related second card to supplement the primary answer"
+);
+
+assert.equal(
+  classifyParentEmotionalState("我真的崩溃了，撑不住了，宝宝一直哭").state,
+  "collapsing"
+);
+assert.equal(
+  classifyParentEmotionalState("我有点焦虑，怕宝宝吃不够，但现在还可以").state,
+  "anxious-stable"
+);
+assert.equal(
+  classifyParentEmotionalState("我想学习一下7个月宝宝过敏食物怎么引入").state,
+  "learning"
+);
+
+const collapsingReply = generateParentSupportReply({
+  message: "我真的崩溃了，撑不住了，宝宝一直哭",
+  activities: [],
+});
+
+assert.match(
+  collapsingReply,
+  /先稳住|先把下一步缩小/,
+  "Expected collapsing emotional state to add stabilization language"
 );
 
 const parentSupportAgentSource = readFileSync(

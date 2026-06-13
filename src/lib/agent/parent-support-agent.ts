@@ -1,6 +1,10 @@
 import type { DemoActivity, DemoChatMessage } from "@/lib/demo/types";
 import type { BabyCareKnowledgeCard } from "@/lib/knowledge/baby-care-cards";
 import { retrieveKnowledgeCards } from "@/lib/knowledge/retrieve-knowledge-cards";
+import {
+  classifyParentEmotionalState,
+  type ParentEmotionalStateResult,
+} from "./emotional-state-classifier";
 
 type Intent = "emotional" | "feeding" | "sleep" | "diaper" | "crying" | "pattern" | "general";
 type DiaperTopic = "poop" | "pee" | "general";
@@ -146,10 +150,11 @@ function sourceLine(cards: BabyCareKnowledgeCard[], language: "zh" | "en") {
 function answerFromKnowledgeCards(
   cards: BabyCareKnowledgeCard[],
   activities: DemoActivity[],
-  language: "zh" | "en"
+  language: "zh" | "en",
+  emotionalState: ParentEmotionalStateResult
 ) {
   const [primaryCard, secondaryCard] = cards;
-  const lines = [primaryCard.answer[language]];
+  const lines = [emotionalStateLine(emotionalState, language), primaryCard.answer[language]];
 
   if (secondaryCard) {
     lines.push(
@@ -170,6 +175,29 @@ function answerFromKnowledgeCards(
 
   lines.push(sourceLine(cards, language));
   return lines.join(" ");
+}
+
+function emotionalStateLine(
+  emotionalState: ParentEmotionalStateResult,
+  language: "zh" | "en"
+) {
+  if (language === "zh") {
+    if (emotionalState.state === "collapsing") {
+      return "我先陪你把情况稳住：先把下一步缩小，不需要现在解决全部问题。";
+    }
+    if (emotionalState.state === "anxious-stable") {
+      return "我听到你有点担心，但你还在有条理地观察宝宝；我们一步一步看。";
+    }
+    return "这个问题很适合用学习模式来处理：先抓重点，再决定今天要做哪一小步。";
+  }
+
+  if (emotionalState.state === "collapsing") {
+    return "Let us steady this first: make the next step smaller; you do not need to solve everything right now.";
+  }
+  if (emotionalState.state === "anxious-stable") {
+    return "I hear the worry, and you are still observing baby thoughtfully. We can take this one step at a time.";
+  }
+  return "This is a good learning-mode question: start with the key idea, then choose one small next step for today.";
 }
 
 function babyUrgentReply(language: "zh" | "en") {
@@ -424,6 +452,7 @@ export function generateParentSupportReply({
 }: ParentSupportInput): string {
   const cleanMessage = message.trim();
   const language = detectLanguage(cleanMessage);
+  const emotionalState = classifyParentEmotionalState(cleanMessage);
 
   if (!cleanMessage) {
     return language === "zh"
@@ -437,7 +466,7 @@ export function generateParentSupportReply({
   const babyAgeMonths = inferBabyAgeMonths(cleanMessage, activities);
   const knowledgeCards = retrieveKnowledgeCards(cleanMessage, babyAgeMonths, 2);
   if (knowledgeCards.length > 0) {
-    return answerFromKnowledgeCards(knowledgeCards, activities, language);
+    return answerFromKnowledgeCards(knowledgeCards, activities, language, emotionalState);
   }
 
   const intent = detectIntent(cleanMessage);
